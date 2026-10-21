@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OACSAS – FY 2026 Budget Monitoring</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/webfont/tabler-icons.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0f1a;--bg2:#111827;--bg3:#1a2235;--bg4:#1e293b;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#e2e8f0;--text2:#94a3b8;--text3:#475569;
+  --accent:#3b82f6;--accent2:#1d4ed8;
+  --green:#22c55e;--amber:#f59e0b;--red:#ef4444;--purple:#a855f7;
+  --sidebar-w:232px;--radius:12px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;font-size:14px;line-height:1.5}
+#sidebar{width:var(--sidebar-w);min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;align-self:flex-start;height:100vh;overflow-y:auto}
+.sb-brand{padding:1.4rem 1.25rem 1rem;border-bottom:1px solid var(--border)}
+.sb-logo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sb-logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),#6366f1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:#fff;flex-shrink:0}
+.sb-title{font-size:13px;font-weight:600;color:#fff;line-height:1.3}
+.sb-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.nav-list{padding:.5rem 0;flex:1}
+.nav-sec{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:10px 1.25rem 4px}
+.nav-btn{display:flex;align-items:center;gap:10px;width:100%;padding:9px 1.25rem;background:none;border:none;border-left:2px solid transparent;cursor:pointer;color:var(--text2);font-size:13px;text-align:left;transition:all .15s}
+.nav-btn:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+.nav-btn.active{background:rgba(59,130,246,.12);border-left-color:var(--accent);color:var(--accent);font-weight:500}
+.nav-btn i{font-size:16px;flex-shrink:0}
+.sb-footer{padding:1rem 1.25rem;border-top:1px solid var(--border);font-size:11px;color:var(--text3);line-height:1.7}
+#main{flex:1;padding:1.75rem;overflow-x:hidden;min-width:0}
+.tab{display:none}.tab.active{display:block}
+.hero{background:linear-gradient(135deg,#0f2a5c 0%,#1a3a8a 50%,#1e4fd8 100%);border-radius:16px;padding:2rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,0.04)}
+.hero::after{content:'';position:absolute;bottom:-40px;right:100px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,0.03)}
+.hero-inner{position:relative;z-index:1}
+.hero-eyebrow{font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.hero-title{font-size:28px;font-weight:600;color:#fff;margin-bottom:4px}
+.hero-sub{font-size:13px;color:rgba(255,255,255,0.55)}
+.hero-stats{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.5rem}
+.hero-stat{background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:12px 20px;min-width:120px}
+.hero-stat-label{font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.hero-stat-value{font-size:22px;font-weight:600;color:#fff;font-family:'DM Mono',monospace}
+.hero-stat-sub{font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px}
+.hero-bar-section{margin-top:1.5rem}
+.hero-bar-labels{display:flex;justify-content:space-between;margin-bottom:6px;font-size:12px;color:rgba(255,255,255,0.55)}
+.hero-bar-wrap{background:rgba(255,255,255,0.12);border-radius:999px;height:8px;overflow:hidden}
+.hero-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,#34d399,#3b82f6);transition:width .8s cubic-bezier(.4,0,.2,1)}
+.metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:12px;margin-bottom:1.5rem}
+.mcard{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.1rem 1.2rem;display:flex;flex-direction:column;gap:8px}
+.mcard-top{display:flex;align-items:center;justify-content:space-between}
+.mcard-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.4px}
+.mcard-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.mcard-value{font-size:22px;font-weight:600;font-family:'DM Mono',monospace;line-height:1}
+.mcard-sub{font-size:11px;color:var(--text2)}
+.section-title{font-size:15px;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.section-title i{font-size:17px;color:var(--accent)}
+.budget-list{display:flex;flex-direction:column;gap:12px;margin-bottom:2rem}
+.budget-item-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:border-color .2s}
+.budget-item-card:hover{border-color:var(--border2)}
+.bi-header{display:flex;align-items:center;gap:10px;padding:1rem 1.25rem;cursor:pointer;user-select:none}
+.bi-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.bi-title{flex:1;min-width:0}
+.bi-name{font-size:13.5px;font-weight:500;color:var(--text)}
+.bi-type{font-size:11px;color:var(--text2);margin-top:1px}
+.bi-chevron{font-size:16px;color:var(--text3);transition:transform .2s}
+.bi-header.open .bi-chevron{transform:rotate(90deg)}
+.bi-progress-bar{height:3px;background:var(--bg3)}
+.bi-progress-fill{height:100%;transition:width .6s ease}
+.bi-body{display:none;padding:0 1.25rem 1.25rem}
+.bi-body.open{display:block}
+.sub-budget-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px;margin-top:1rem}
+.sub-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.sub-card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.sub-card-amounts{text-align:right;flex-shrink:0;margin-left:8px}
+.sub-amount-spent{font-size:17px;font-weight:600;font-family:'DM Mono',monospace}
+.sub-amount-budget{font-size:11px;color:var(--text2);margin-top:1px}
+.sub-bar-wrap{background:rgba(255,255,255,0.07);border-radius:999px;height:5px;overflow:hidden;margin-bottom:6px}
+.sub-bar-fill{height:100%;border-radius:999px;transition:width .6s ease}
+.sub-pct-row{display:flex;justify-content:space-between;font-size:11px;color:var(--text2)}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px}
+.page-title{font-size:20px;font-weight:600}
+.page-sub{font-size:12.5px;color:var(--text2);margin-top:3px}
+.tbl-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1rem}
+.data-table{width:100%;border-collapse:collapse;font-size:13px}
+.data-table thead tr{background:var(--bg3)}
+.data-table th{text-align:left;padding:10px 14px;font-weight:500;color:var(--text2);font-size:11.5px;white-space:nowrap}
+.data-table tbody tr{border-top:1px solid var(--border)}
+.data-table tbody tr:hover{background:rgba(255,255,255,0.025)}
+.data-table td{padding:10px 14px;color:var(--text);vertical-align:middle}
+.data-table td.mono{font-family:'DM Mono',monospace;font-size:12.5px}
+.data-table td.muted{color:var(--text2);font-size:12.5px}
+.action-cell{display:flex;gap:6px;align-items:center}
+.empty-row td{text-align:center;padding:2.5rem;color:var(--text3);font-size:13px}
+.filter-row{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap;align-items:center}
+.filter-select{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:12.5px;padding:7px 10px;outline:none;cursor:pointer;font-family:'DM Sans',sans-serif}
+.filter-select:focus{border-color:var(--accent)}
+.filter-input{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:12.5px;padding:7px 10px;outline:none;flex:1;min-width:160px;font-family:'DM Sans',sans-serif}
+.filter-input:focus{border-color:var(--accent)}
+.filter-input::placeholder{color:var(--text3)}
+.util-bar-wrap{background:var(--bg3);border-radius:999px;height:6px;overflow:hidden;width:80px;display:inline-block;vertical-align:middle}
+.util-bar-fill{height:100%;border-radius:999px}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:1.75rem;width:520px;max-width:96vw;max-height:92vh;overflow-y:auto;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.modal-title{font-size:17px;font-weight:600;margin-bottom:3px}
+.modal-sub{font-size:12px;color:var(--text2);margin-bottom:1.4rem}
+.close-modal{position:absolute;top:1rem;right:1rem;background:none;border:none;color:var(--text2);font-size:20px;cursor:pointer;line-height:1;padding:2px}
+.close-modal:hover{color:var(--text)}
+.form-group{margin-bottom:.9rem}
+.form-label{font-size:12px;color:var(--text2);margin-bottom:5px;display:block;font-weight:500}
+.form-label span{color:var(--red)}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13.5px;padding:9px 12px;outline:none;transition:border-color .15s;font-family:'DM Sans',sans-serif}
+.form-input:focus{border-color:var(--accent)}
+.form-input::placeholder{color:var(--text3)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.form-hint{font-size:11px;color:var(--text3);margin-top:4px}
+.modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:1.4rem;padding-top:1rem;border-top:1px solid var(--border)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif;white-space:nowrap}
+.btn:hover{opacity:.88}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-secondary{background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border2)}
+.btn-danger{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+.btn-danger:hover{background:rgba(239,68,68,.25)}
+.btn-icon{width:30px;height:30px;padding:0;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;border:1px solid var(--border2);background:rgba(255,255,255,0.04);color:var(--text2);transition:all .15s;font-family:'DM Sans',sans-serif}
+.btn-icon:hover{color:var(--text);background:rgba(255,255,255,0.08)}
+.btn-icon.edit:hover{color:#60a5fa;border-color:rgba(96,165,250,.35)}
+.btn-icon.del:hover{color:#f87171;border-color:rgba(248,113,113,.35)}
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.badge-green{background:rgba(34,197,94,.13);color:#4ade80}
+.badge-amber{background:rgba(245,158,11,.13);color:#fbbf24}
+.badge-red{background:rgba(239,68,68,.13);color:#f87171}
+.badge-blue{background:rgba(59,130,246,.13);color:#60a5fa}
+.badge-gray{background:rgba(255,255,255,.07);color:var(--text2)}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:300;display:none;align-items:center;justify-content:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:1.5rem;width:380px;max-width:95vw;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.confirm-title{font-size:16px;font-weight:600;margin-bottom:6px}
+.confirm-msg{font-size:13px;color:var(--text2);margin-bottom:1.25rem;line-height:1.65}
+.confirm-actions{display:flex;gap:8px;justify-content:flex-end}
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:12px 18px;font-size:13px;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast i{font-size:16px}
+.budget-info-box{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 14px;font-size:12.5px;display:flex;gap:1.5rem;flex-wrap:wrap}
+
+/* ── REPORT TAB ── */
+.rpt-controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:1.25rem}
+.rpt-section{margin-bottom:2rem}
+.rpt-section-title{font-size:14px;font-weight:600;margin-bottom:.9rem;display:flex;align-items:center;gap:8px;color:var(--text)}
+.rpt-section-title i{font-size:16px;color:var(--accent)}
+.rpt-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.chart-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem}
+.chart-box-title{font-size:12.5px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1rem}
+.bar-chart-wrap{display:flex;flex-direction:column;gap:8px}
+.bc-row{display:flex;align-items:center;gap:10px}
+.bc-label{font-size:11.5px;color:var(--text2);width:80px;flex-shrink:0;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bc-track{flex:1;background:rgba(255,255,255,.07);border-radius:999px;height:18px;overflow:hidden;position:relative}
+.bc-fill{height:100%;border-radius:999px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:10px;font-weight:600;color:#fff;white-space:nowrap;min-width:2px;transition:width .6s ease}
+.bc-val{font-size:11px;font-family:'DM Mono',monospace;color:var(--text2);width:100px;flex-shrink:0;text-align:right}
+.q-summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.25rem}
+.q-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem}
+.q-card-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.q-card-amount{font-size:19px;font-weight:600;font-family:'DM Mono',monospace;line-height:1;margin-bottom:4px}
+.q-card-pct{font-size:11.5px;color:var(--text2);margin-bottom:8px}
+.q-util-track{background:rgba(255,255,255,.07);border-radius:999px;height:5px;overflow:hidden}
+.q-util-fill{height:100%;border-radius:999px}
+.rpt-table-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);overflow:auto;margin-bottom:1rem}
+.rpt-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.rpt-table thead tr{background:var(--bg3)}
+.rpt-table th{text-align:right;padding:9px 13px;font-weight:500;color:var(--text2);font-size:11px;white-space:nowrap}
+.rpt-table th:first-child{text-align:left}
+.rpt-table tbody tr{border-top:1px solid var(--border)}
+.rpt-table tbody tr:hover{background:rgba(255,255,255,.025)}
+.rpt-table td{padding:9px 13px;text-align:right;font-family:'DM Mono',monospace;font-size:12px;color:var(--text)}
+.rpt-table td:first-child{text-align:left;font-family:'DM Sans',sans-serif;color:var(--text2)}
+.rpt-table tfoot td{border-top:2px solid var(--border2);font-weight:700;color:var(--text);background:var(--bg3)}
+.util-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:2px 8px;border-radius:999px}
+.rpt-print-btn{margin-left:auto}
+@media print{
+  #sidebar{display:none}
+  #main{padding:0}
+  .rpt-controls,.rpt-print-btn,.nav-btn{display:none}
+  .tab{display:block!important}
+  #tab-report{display:block!important}
+}
+</style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <div class="sb-brand">
+    <div class="sb-logo">
+      <div class="sb-logo-icon"><i class="ti ti-chart-bar"></i></div>
+      <div><div class="sb-title">OACSAS</div><div class="sb-sub">Budget Monitor</div></div>
+    </div>
+    <div class="sb-sub" style="margin-top:4px">FY 2026 · General Fund</div>
+  </div>
+  <div class="nav-list">
+    <div class="nav-sec">Monitor</div>
+    <button class="nav-btn active" data-tab="dashboard"><i class="ti ti-layout-dashboard"></i>Dashboard</button>
+    <button class="nav-btn" data-tab="expenses"><i class="ti ti-receipt"></i>Expense Entries</button>
+    <button class="nav-btn" data-tab="summary"><i class="ti ti-table"></i>Budget Summary</button>
+    <button class="nav-btn" data-tab="report"><i class="ti ti-file-analytics"></i>Generate Reports</button>
+    <div class="nav-sec">Tools</div>
+    <button class="nav-btn" onclick="exportCSV()"><i class="ti ti-download"></i>Export to CSV</button>
+    <button class="nav-btn" onclick="triggerClearAll()"><i class="ti ti-trash"></i>Clear All Data</button>
+  </div>
+  <div class="sb-footer">FY 2026 Approved Budget<br><strong style="color:var(--text2)">₱2,333,413.08</strong><br>MOOE + Capital Outlay</div>
+</nav>
+
+<main id="main">
+
+  <!-- DASHBOARD -->
+  <div class="tab active" id="tab-dashboard">
+    <div class="hero">
+      <div class="hero-inner">
+        <div class="hero-eyebrow">FY 2026 · OACSAS</div>
+        <div class="hero-title">Budget Monitoring Dashboard</div>
+        <div class="hero-sub">Office of the Assistant Commissioner for Support &amp; Administrative Services</div>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="hero-stat-label">Approved Budget</div><div class="hero-stat-value" id="h-approved">₱2,333,413</div><div class="hero-stat-sub">MOOE + Capital Outlay</div></div>
+          <div class="hero-stat"><div class="hero-stat-label">Total Obligated</div><div class="hero-stat-value" id="h-spent">₱0.00</div><div class="hero-stat-sub" id="h-spent-sub">0.00% of budget</div></div>
+          <div class="hero-stat"><div class="hero-stat-label">Remaining Balance</div><div class="hero-stat-value" id="h-balance">₱2,333,413</div><div class="hero-stat-sub">available</div></div>
+          <div class="hero-stat"><div class="hero-stat-label">Utilization Rate</div><div class="hero-stat-value" id="h-rate">0.00%</div><div class="hero-stat-sub">of total budget</div></div>
+        </div>
+        <div class="hero-bar-section">
+          <div class="hero-bar-labels"><span>Budget Utilization</span><span id="h-bar-label">0.00% used</span></div>
+          <div class="hero-bar-wrap"><div class="hero-bar" id="hero-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="metrics-grid" id="metrics-grid"></div>
+    <div class="section-title"><i class="ti ti-list-check"></i>Budget Line Items — Click to expand</div>
+    <div class="budget-list" id="budget-list"></div>
+  </div>
+
+  <!-- EXPENSE ENTRIES -->
+  <div class="tab" id="tab-expenses">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Expense Entries</div>
+        <div class="page-sub">Add, edit, or delete records. All changes update the Dashboard &amp; Summary in real time.</div>
+      </div>
+      <button class="btn btn-primary" onclick="openAddModal()"><i class="ti ti-plus"></i>Add Expense</button>
+    </div>
+    <div class="filter-row">
+      <select class="filter-select" id="f-item-filter" onchange="renderExpTab()">
+        <option value="">All Budget Items</option>
+      </select>
+      <select class="filter-select" id="f-status-filter" onchange="renderExpTab()">
+        <option value="">All Statuses</option>
+        <option>Obligated</option><option>Disbursed</option><option>Pending</option>
+      </select>
+      <input class="filter-input" id="f-search" placeholder="Search description or OR/ref…" oninput="renderExpTab()"/>
+    </div>
+    <div class="tbl-wrap">
+      <table class="data-table">
+        <thead><tr>
+          <th style="width:95px">Date</th>
+          <th style="min-width:160px">Budget Item</th>
+          <th style="min-width:160px">Sub-Category</th>
+          <th>Description / Particulars</th>
+          <th style="width:110px">OR / Ref #</th>
+          <th style="text-align:right;width:120px">Amount (₱)</th>
+          <th style="width:100px">Status</th>
+          <th style="width:80px">Actions</th>
+        </tr></thead>
+        <tbody id="exp-tbody"></tbody>
+      </table>
+    </div>
+    <div id="exp-footer" style="display:flex;justify-content:flex-end;gap:1.5rem;font-size:12.5px;color:var(--text2);padding:0 2px .5rem"></div>
+  </div>
+
+  <!-- BUDGET SUMMARY -->
+  <div class="tab" id="tab-summary">
+    <div class="page-header">
+      <div><div class="page-title">Budget Summary</div><div class="page-sub">FY 2026 utilization by budget line item &amp; sub-category</div></div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="data-table">
+        <thead><tr>
+          <th style="min-width:180px">Budget Line Item</th>
+          <th style="min-width:160px">Sub-Category</th>
+          <th>Object of Expenditure</th>
+          <th style="text-align:right">Approved (₱)</th>
+          <th style="text-align:right">Obligated (₱)</th>
+          <th style="text-align:right">Balance (₱)</th>
+          <th style="min-width:140px">Utilization</th>
+          <th>Status</th>
+        </tr></thead>
+        <tbody id="sum-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GENERATE REPORTS -->
+  <div class="tab" id="tab-report">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Generate Reports</div>
+        <div class="page-sub">Monthly &amp; quarterly expense breakdown with budget utilization analytics</div>
+      </div>
+      <button class="btn btn-secondary rpt-print-btn" onclick="window.print()"><i class="ti ti-printer"></i>Print / Save PDF</button>
+    </div>
+
+    <div class="rpt-controls">
+      <select class="filter-select" id="rpt-year" onchange="renderReport()">
+        <option value="2026">FY 2026</option>
+        <option value="2025">FY 2025</option>
+      </select>
+      <select class="filter-select" id="rpt-item" onchange="renderReport()">
+        <option value="">All Budget Items</option>
+      </select>
+      <select class="filter-select" id="rpt-status" onchange="renderReport()">
+        <option value="">All Statuses</option>
+        <option>Obligated</option><option>Disbursed</option><option>Pending</option>
+      </select>
+    </div>
+
+    <!-- QUARTERLY SUMMARY CARDS -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><i class="ti ti-layout-grid"></i>Quarterly Budget Utilization</div>
+      <div class="q-summary-grid" id="rpt-q-cards"></div>
+      <div class="rpt-table-wrap">
+        <table class="rpt-table">
+          <thead><tr>
+            <th>Budget Item</th>
+            <th>Q1 (Jan–Mar)</th>
+            <th>Q2 (Apr–Jun)</th>
+            <th>Q3 (Jul–Sep)</th>
+            <th>Q4 (Oct–Dec)</th>
+            <th>Total Obligated</th>
+            <th>Approved Budget</th>
+            <th>Utilization</th>
+          </tr></thead>
+          <tbody id="rpt-q-tbody"></tbody>
+          <tfoot><tr>
+            <td>GRAND TOTAL</td>
+            <td id="rpt-q-tot1"></td><td id="rpt-q-tot2"></td><td id="rpt-q-tot3"></td><td id="rpt-q-tot4"></td>
+            <td id="rpt-q-tot-all"></td><td id="rpt-q-bgt-all"></td><td id="rpt-q-util-all"></td>
+          </tr></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- MONTHLY EXPENSE TABLE -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><i class="ti ti-calendar-month"></i>Monthly Expense Breakdown</div>
+      <div class="rpt-table-wrap">
+        <table class="rpt-table" id="rpt-monthly-table">
+          <thead id="rpt-monthly-head"></thead>
+          <tbody id="rpt-monthly-tbody"></tbody>
+          <tfoot id="rpt-monthly-foot"></tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- CHARTS SECTION -->
+    <div class="rpt-section">
+      <div class="rpt-section-title"><i class="ti ti-chart-bar"></i>Visual Summary</div>
+      <div class="rpt-grid-2">
+        <div class="chart-box">
+          <div class="chart-box-title">Monthly Spending (₱)</div>
+          <div class="bar-chart-wrap" id="rpt-monthly-chart"></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-box-title">Quarterly Utilization Rate (%)</div>
+          <div class="bar-chart-wrap" id="rpt-q-chart"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<!-- ADD / EDIT MODAL -->
+<div class="overlay" id="exp-modal">
+  <div class="modal">
+    <button class="close-modal" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    <div class="modal-title" id="modal-title">Add Expense</div>
+    <div class="modal-sub">Fill in all required fields (<span style="color:var(--red)">*</span>). Budget balances update automatically.</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Date <span>*</span></label>
+        <input type="date" class="form-input" id="m-date"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">OR / Reference No.</label>
+        <input type="text" class="form-input" id="m-ref" placeholder="e.g. OR-2026-001"/>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Budget Item <span>*</span></label>
+      <select class="form-input" id="m-item" onchange="onItemChange()">
+        <option value="">— Select Budget Item —</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Sub-Category <span>*</span></label>
+      <select class="form-input" id="m-sub" onchange="onSubChange()" disabled>
+        <option value="">— Select Sub-Category first —</option>
+      </select>
+      <div class="form-hint" id="m-sub-hint"></div>
+    </div>
+
+    <div id="m-bgt-box" style="display:none;margin-bottom:.9rem">
+      <div class="budget-info-box">
+        <div><span style="color:var(--text2)">Approved: </span><strong id="m-bgt-ap" style="font-family:'DM Mono',monospace"></strong></div>
+        <div><span style="color:var(--text2)">Already Obligated: </span><strong id="m-bgt-sp" style="font-family:'DM Mono',monospace;color:var(--amber)"></strong></div>
+        <div><span style="color:var(--text2)">Remaining: </span><strong id="m-bgt-bl" style="font-family:'DM Mono',monospace;color:var(--green)"></strong></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Amount (₱) <span>*</span></label>
+      <input type="number" class="form-input" id="m-amount" placeholder="0.00" step="0.01" min="0"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description / Particulars <span>*</span></label>
+      <input type="text" class="form-input" id="m-desc" placeholder="Brief description of the expense…"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Status</label>
+      <select class="form-input" id="m-status">
+        <option value="Obligated">Obligated</option>
+        <option value="Disbursed">Disbursed</option>
+        <option value="Pending">Pending</option>
+      </select>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn" onclick="saveExpense()"><i class="ti ti-check"></i>Save Expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM DIALOG -->
+<div class="confirm-overlay" id="conf-overlay">
+  <div class="confirm-box">
+    <div class="confirm-title" id="conf-title">Confirm</div>
+    <div class="confirm-msg" id="conf-msg"></div>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" id="conf-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-circle-check" id="toast-icon"></i><span id="toast-msg"></span></div>
+
+<script>
+// ── BUDGET DATA ──────────────────────────────────────────────────────────────
+const BUDGET_ITEMS = [
+  {id:'purchase-equipment',name:'Purchase of Office Equipment & Appliances',icon:'ti-device-laptop',color:'#6366f1',colorBg:'rgba(99,102,241,0.12)',subs:[
+    {id:'comb-machine',label:'Comb Binding Machine (Heavy Duty)',type:'Semi-Expendable Machinery & Equipment',budget:20000},
+    {id:'tower-fan',label:'Tower Fan',type:'Semi-Expendable Machinery & Equipment',budget:18000},
+    {id:'drinking-glass',label:'Sets of Drinking Glass',type:'Semi-Expendable – Other Equipment',budget:3000},
+    {id:'cup-saucer',label:'Sets of Cup and Saucer',type:'Semi-Expendable – Other Equipment',budget:3000}]},
+  {id:'traveling',name:'Travelling Related Expenses',icon:'ti-plane-departure',color:'#3b82f6',colorBg:'rgba(59,130,246,0.12)',subs:[
+    {id:'air-tickets',label:'Air Tickets – Local Travels (Asst. Commissioner)',type:'Traveling Expenses – Local',budget:200000.04},
+    {id:'rfid-toll',label:'RFID Toll & Parking Fee',type:'Traveling Expenses – Local',budget:30000}]},
+  {id:'learning-dev',name:'Learning and Development',icon:'ti-school',color:'#14b8a6',colorBg:'rgba(20,184,166,0.12)',subs:[
+    {id:'ld-training',label:'L&D – 5 Staff & 1 Asst. Commissioner (₱6,000 × 6 pax)',type:'Training Expenses',budget:36000}]},
+  {id:'meetings-csc',name:'Conduct of Meetings / Activities with CSC & Other Agencies',icon:'ti-users',color:'#f59e0b',colorBg:'rgba(245,158,11,0.12)',subs:[
+    {id:'meals-csc',label:'Meals for Meetings (₱325 × 35 pax × 12 months)',type:'Representation Expenses',budget:136500}]},
+  {id:'meetings-sas',name:'Conduct of Meetings with SAS Cluster Offices',icon:'ti-building-community',color:'#a855f7',colorBg:'rgba(168,85,247,0.12)',subs:[
+    {id:'meals-sas',label:'Meals / Representation (₱325 × 20 pax × 7 meetings)',type:'Representation Expenses',budget:45500},
+    {id:'supplies-sas',label:'Other Supplies & Materials (Interfold Tissue, Plates, etc.)',type:'Other Maintenance & Operating Expenses',budget:8000}]},
+  {id:'pantry',name:'Pantry Supplies',icon:'ti-tools-kitchen-2',color:'#22c55e',colorBg:'rgba(34,197,94,0.12)',subs:[
+    {id:'pantry-sup',label:'Pantry Supplies & Other Materials',type:'Other Maintenance & Operating Expenses',budget:8000}]},
+  {id:'notarial',name:'Notarial Services',icon:'ti-file-certificate',color:'#ef4444',colorBg:'rgba(239,68,68,0.12)',subs:[
+    {id:'notarial-fees',label:'Notarial Fees for Documents',type:'Legal Services',budget:5000}]},
+  {id:'office-supplies',name:'Office Supplies & Other Materials (Non-PSDBM)',icon:'ti-paperclip',color:'#0ea5e9',colorBg:'rgba(14,165,233,0.12)',subs:[
+    {id:'other-sup',label:'A3 Paper, Stamps, Inks, Frames, Storage Boxes, etc.',type:'Other Maintenance & Operating Expenses',budget:25000},
+    {id:'cse-sup',label:'Office Supplies – CSE (PS DBM Catalogue)',type:'Office Supplies Expenses',budget:58977.04}]},
+  {id:'team-building',name:'OACSAS Team Building Activity',icon:'ti-heart-handshake',color:'#f97316',colorBg:'rgba(249,115,22,0.12)',subs:[
+    {id:'tba',label:'Meals / Accommodation / Gasoline / Supplies (6 pax × 2 days)',type:'Charged to OFAM',budget:36000}]},
+  {id:'ops-planning',name:'OACSAS Operations Planning',icon:'ti-chart-gantt',color:'#84cc16',colorBg:'rgba(132,204,22,0.12)',subs:[
+    {id:'plan-meals',label:'Meals (6 pax × 2 days)',type:'Representation Expenses',budget:10000},
+    {id:'plan-sup',label:'Other Supplies & Materials',type:'Other Maintenance & Operating Expenses',budget:2000}]},
+  {id:'year-end',name:'OACSAS Year-End Assessment',icon:'ti-calendar-stats',color:'#ec4899',colorBg:'rgba(236,72,153,0.12)',subs:[
+    {id:'ye-meals',label:'Meals (6 pax × 2 days)',type:'Representation Expenses',budget:4000},
+    {id:'ye-accommo',label:'Accommodation',type:'Rental / Lease Expense',budget:8000}]},
+  {id:'yearend-sas',name:'Year-End Assessment with SAS Cluster Offices',icon:'ti-users-group',color:'#2dd4bf',colorBg:'rgba(45,212,191,0.12)',subs:[
+    {id:'yesas-meals',label:'Meals (₱650 × 29 pax)',type:'Representation Expenses',budget:18850}]},
+  {id:'cos-workers',name:'Hiring of Contract of Service (COS) Workers',icon:'ti-user-check',color:'#a3e635',colorBg:'rgba(163,230,53,0.12)',subs:[
+    {id:'cos-sg10',label:'SG 10 – 1 COS Worker (₱32,300.40/mo × 12)',type:'Labor and Wages',budget:387604.80},
+    {id:'cos-sg11',label:'SG 11 – 1 COS Worker (₱38,046/mo × 12)',type:'Labor and Wages',budget:456552.00},
+    {id:'cos-sg18',label:'SG 18 – 1 COS Worker (₱64,581.60/mo × 12)',type:'Labor and Wages',budget:774979.20}]},
+  {id:'si1',name:'SI#1: Capacity Building – Common Financial Documents',icon:'ti-presentation',color:'#fb923c',colorBg:'rgba(251,146,60,0.12)',subs:[
+    {id:'si1-fin-meals',label:'Meals – Finalization (₱325 × 6 pax × 2 mtgs)',type:'Representation Expenses',budget:3900},
+    {id:'si1-fin-sup',label:'Other Supplies – Finalization',type:'Other Maintenance & Operating Expenses',budget:500},
+    {id:'si1-trn-meals',label:'Meals – 2-Day Training (₱400 × 85 pax)',type:'Representation Expenses',budget:34000},
+    {id:'si1-trn-sup',label:'Other Supplies – Training',type:'Other Maintenance & Operating Expenses',budget:4000},
+    {id:'si1-trn-kits',label:'Training Kits (₱150 × 80 pax)',type:'Other Maintenance & Operating Expenses',budget:12000},
+    {id:'si1-eval-meals',label:'Meals – Post-Evaluation (₱325 × 6 pax)',type:'Representation Expenses',budget:1950},
+    {id:'si1-eval-sup',label:'Other Supplies – Post-Evaluation',type:'Other Maintenance & Operating Expenses',budget:200}]},
+  {id:'si2',name:'SI#2: Implementation Review – CSC Onboarding Program',icon:'ti-door-enter',color:'#38bdf8',colorBg:'rgba(56,189,248,0.12)',subs:[
+    {id:'si2-fin-meals',label:'Meals – Finalization (₱325 × 15 pax × 2 mtgs)',type:'Representation Expenses',budget:9750},
+    {id:'si2-fin-sup',label:'Other Supplies – Finalization',type:'Other Maintenance & Operating Expenses',budget:500},
+    {id:'si2-fgd-meals',label:'FGD Meals (₱325 × 20 pax × 2 mtgs)',type:'Representation Expenses',budget:13000},
+    {id:'si2-fgd-sup',label:'Other Supplies – FGD',type:'Other Maintenance & Operating Expenses',budget:500},
+    {id:'si2-eval-meals',label:'Meals – Post-Evaluation (₱325 × 6 pax)',type:'Representation Expenses',budget:1950},
+    {id:'si2-eval-sup',label:'Other Supplies – Post-Evaluation',type:'Other Maintenance & Operating Expenses',budget:200}]}
+];
+const TOTAL_BUDGET = 2333413.08;
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let expenses = JSON.parse(localStorage.getItem('oacsas-exp-v3') || '[]');
+let editId = null;
+
+function persist(){ localStorage.setItem('oacsas-exp-v3', JSON.stringify(expenses)); }
+
+// ── HELPERS ──────────────────────────────────────────────────────────────────
+const peso = n => '₱'+Number(n).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pct  = (s,b) => b===0?0:Math.min(100,(s/b)*100);
+const barC = p => p<50?'var(--green)':p<85?'var(--amber)':'var(--red)';
+const today = () => new Date().toISOString().slice(0,10);
+const uid   = () => Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+const fmtD  = d => { if(!d)return'—'; const[y,m,dy]=d.split('-'); return`${dy}/${m}/${y}`; };
+const findItem = id => BUDGET_ITEMS.find(i=>i.id===id)||null;
+const findSub  = (item,sid) => item?item.subs.find(s=>s.id===sid)||null:null;
+const subSpent = (iid,sid,exId=null) => expenses.filter(e=>e.itemId===iid&&e.subId===sid&&e.id!==exId).reduce((s,e)=>s+parseFloat(e.amount),0);
+const itemSpent= iid => expenses.filter(e=>e.itemId===iid).reduce((s,e)=>s+parseFloat(e.amount),0);
+const totalSpent = () => expenses.reduce((s,e)=>s+parseFloat(e.amount),0);
+
+const statusBadge = p =>
+  p===0?'<span class="badge badge-gray">No Expenses</span>':
+  p<50 ?'<span class="badge badge-green">On Track</span>':
+  p<85 ?'<span class="badge badge-amber">Moderate</span>':
+  p<100?'<span class="badge badge-red">Near Limit</span>':
+        '<span class="badge badge-red">Exceeded</span>';
+
+const expBadge = s =>
+  s==='Disbursed'?'<span class="badge badge-green">Disbursed</span>':
+  s==='Obligated'?'<span class="badge badge-blue">Obligated</span>':
+  '<span class="badge badge-amber">Pending</span>';
+
+// ── RENDER ALL ────────────────────────────────────────────────────────────────
+function renderAll(){ renderDashboard(); renderExpTab(); renderSummary(); }
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+function renderDashboard(){
+  const spent=totalSpent(), bal=TOTAL_BUDGET-spent, rate=(spent/TOTAL_BUDGET)*100;
+  document.getElementById('h-spent').textContent   = peso(spent);
+  document.getElementById('h-spent-sub').textContent = rate.toFixed(2)+'% of budget';
+  document.getElementById('h-balance').textContent = peso(bal);
+  document.getElementById('h-rate').textContent    = rate.toFixed(2)+'%';
+  document.getElementById('hero-bar').style.width  = Math.min(100,rate).toFixed(2)+'%';
+  document.getElementById('h-bar-label').textContent = rate.toFixed(2)+'% used';
+
+  document.getElementById('metrics-grid').innerHTML=`
+    <div class="mcard"><div class="mcard-top"><span class="mcard-label">Approved Budget</span><div class="mcard-icon" style="background:rgba(59,130,246,.15);color:#60a5fa"><i class="ti ti-coin"></i></div></div><div class="mcard-value" style="font-size:18px">${peso(TOTAL_BUDGET)}</div><div class="mcard-sub">FY 2026 Approved</div></div>
+    <div class="mcard"><div class="mcard-top"><span class="mcard-label">Total Obligated</span><div class="mcard-icon" style="background:rgba(239,68,68,.15);color:#f87171"><i class="ti ti-arrow-up-right"></i></div></div><div class="mcard-value" style="font-size:18px;color:var(--red)">${peso(spent)}</div><div class="mcard-sub">${rate.toFixed(2)}% utilized</div></div>
+    <div class="mcard"><div class="mcard-top"><span class="mcard-label">Balance</span><div class="mcard-icon" style="background:rgba(34,197,94,.15);color:#4ade80"><i class="ti ti-wallet"></i></div></div><div class="mcard-value" style="font-size:18px;color:var(--green)">${peso(bal)}</div><div class="mcard-sub">Remaining</div></div>
+    <div class="mcard"><div class="mcard-top"><span class="mcard-label">Transactions</span><div class="mcard-icon" style="background:rgba(168,85,247,.15);color:#c084fc"><i class="ti ti-receipt-2"></i></div></div><div class="mcard-value" style="color:var(--purple)">${expenses.length}</div><div class="mcard-sub">Recorded entries</div></div>`;
+
+  document.getElementById('budget-list').innerHTML = BUDGET_ITEMS.map(item=>{
+    const iSpent=itemSpent(item.id), iBgt=item.subs.reduce((s,sb)=>s+sb.budget,0), iP=pct(iSpent,iBgt);
+    return `<div class="budget-item-card" id="bic-${item.id}">
+      <div class="bi-header" onclick="toggleItem('${item.id}')">
+        <div class="bi-icon" style="background:${item.colorBg};color:${item.color}"><i class="ti ${item.icon}"></i></div>
+        <div class="bi-title"><div class="bi-name">${item.name}</div><div class="bi-type">Approved: ${peso(iBgt)}</div></div>
+        <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+          <div style="text-align:right"><div style="font-size:11px;color:var(--text2)">${peso(iSpent)} spent</div><div style="font-size:13px;font-weight:600;font-family:'DM Mono',monospace;color:${barC(iP)}">${iP.toFixed(1)}%</div></div>
+          ${statusBadge(iP)}<i class="ti ti-chevron-right bi-chevron"></i>
+        </div>
+      </div>
+      <div class="bi-progress-bar"><div class="bi-progress-fill" style="width:${Math.min(100,iP).toFixed(1)}%;background:${barC(iP)}"></div></div>
+      <div class="bi-body" id="bib-${item.id}">
+        <div class="sub-budget-grid">
+          ${item.subs.map(sub=>{ const s=subSpent(item.id,sub.id),p=pct(s,sub.budget),bl=sub.budget-s; return `
+          <div class="sub-card">
+            <div class="sub-card-head">
+              <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px">${sub.label}</div><div style="font-size:11px;color:var(--text3)">${sub.type}</div></div>
+              <div class="sub-card-amounts"><div class="sub-amount-spent" style="color:${barC(p)}">${peso(s)}</div><div class="sub-amount-budget">of ${peso(sub.budget)}</div></div>
+            </div>
+            <div class="sub-bar-wrap"><div class="sub-bar-fill" style="width:${Math.min(100,p).toFixed(1)}%;background:${barC(p)}"></div></div>
+            <div class="sub-pct-row"><span>${p.toFixed(1)}% utilized</span><span>Balance: ${peso(bl)}</span></div>
+          </div>`;}).join('')}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleItem(id){
+  const h=document.querySelector(`#bic-${id} .bi-header`),b=document.getElementById(`bib-${id}`);
+  h.classList.toggle('open');b.classList.toggle('open');
+}
+
+// ── EXPENSE ENTRIES TAB ───────────────────────────────────────────────────────
+function renderExpTab(){
+  const itemF  = document.getElementById('f-item-filter').value;
+  const statF  = document.getElementById('f-status-filter').value;
+  const srch   = (document.getElementById('f-search').value||'').toLowerCase();
+  let rows=[...expenses].sort((a,b)=>b.date.localeCompare(a.date));
+  if(itemF) rows=rows.filter(e=>e.itemId===itemF);
+  if(statF) rows=rows.filter(e=>e.status===statF);
+  if(srch)  rows=rows.filter(e=>(e.desc||'').toLowerCase().includes(srch)||(e.ref||'').toLowerCase().includes(srch));
+
+  const tbody=document.getElementById('exp-tbody');
+  if(!rows.length){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="8"><i class="ti ti-inbox" style="font-size:22px;display:block;margin-bottom:6px"></i>No records found. Click <strong>Add Expense</strong> to get started.</td></tr>`;
+    document.getElementById('exp-footer').innerHTML='';return;
+  }
+  tbody.innerHTML=rows.map(e=>{
+    const item=findItem(e.itemId), sub=item?findSub(item,e.subId):null;
+    return `<tr>
+      <td class="muted">${fmtD(e.date)}</td>
+      <td style="font-size:12.5px">
+        ${item?`<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${item.color};margin-right:5px;flex-shrink:0;vertical-align:middle"></span>${item.name}`:'—'}
+      </td>
+      <td style="font-size:12px;color:var(--text2)">${sub?sub.label:'—'}</td>
+      <td>${e.desc}</td>
+      <td class="muted">${e.ref||'—'}</td>
+      <td class="mono" style="text-align:right">${peso(e.amount)}</td>
+      <td>${expBadge(e.status)}</td>
+      <td><div class="action-cell">
+        <button class="btn-icon edit" onclick="openEditModal('${e.id}')" title="Edit"><i class="ti ti-pencil"></i></button>
+        <button class="btn-icon del"  onclick="triggerDelete('${e.id}')" title="Delete"><i class="ti ti-trash"></i></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  const filtTotal=rows.reduce((s,e)=>s+parseFloat(e.amount),0);
+  document.getElementById('exp-footer').innerHTML=
+    `<span>Showing <strong>${rows.length}</strong> of <strong>${expenses.length}</strong> record(s)</span>
+     <span>Filtered Total: <strong style="font-family:'DM Mono',monospace;color:var(--amber)">${peso(filtTotal)}</strong></span>
+     <span>Grand Total Obligated: <strong style="font-family:'DM Mono',monospace;color:var(--red)">${peso(totalSpent())}</strong></span>`;
+}
+
+// ── BUDGET SUMMARY ────────────────────────────────────────────────────────────
+function renderSummary(){
+  let html='';
+  BUDGET_ITEMS.forEach(item=>{
+    const iBgt=item.subs.reduce((s,sb)=>s+sb.budget,0), iSpent=itemSpent(item.id), iP=pct(iSpent,iBgt);
+    item.subs.forEach((sub,i)=>{
+      const s=subSpent(item.id,sub.id), bl=sub.budget-s, p=pct(s,sub.budget);
+      html+=`<tr>
+        ${i===0?`<td rowspan="${item.subs.length}" style="border-right:1px solid var(--border);font-weight:500;font-size:12.5px;vertical-align:top;padding-top:14px"><div style="display:flex;gap:7px;align-items:flex-start"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${item.color};flex-shrink:0;margin-top:4px"></span>${item.name}</div></td>`:''}
+        <td style="font-size:12.5px">${sub.label}</td>
+        <td class="muted" style="font-size:11.5px">${sub.type}</td>
+        <td class="mono" style="text-align:right">${peso(sub.budget)}</td>
+        <td class="mono" style="text-align:right;color:${barC(p)}">${peso(s)}</td>
+        <td class="mono" style="text-align:right;color:${bl>=0?'var(--green)':'var(--red)'}">${peso(bl)}</td>
+        <td><div style="display:flex;align-items:center;gap:8px"><div class="util-bar-wrap"><div class="util-bar-fill" style="width:${Math.min(100,p).toFixed(1)}%;background:${barC(p)}"></div></div><span style="font-size:12px;font-family:'DM Mono',monospace;color:${barC(p)}">${p.toFixed(1)}%</span></div></td>
+        <td>${statusBadge(p)}</td>
+      </tr>`;
+    });
+    html+=`<tr style="background:var(--bg3)">
+      <td colspan="2" style="font-size:12px;font-weight:600;color:var(--text2)">Subtotal — ${item.name}</td>
+      <td></td>
+      <td class="mono" style="text-align:right;font-weight:600">${peso(iBgt)}</td>
+      <td class="mono" style="text-align:right;font-weight:600;color:${barC(iP)}">${peso(iSpent)}</td>
+      <td class="mono" style="text-align:right;font-weight:600;color:${(iBgt-iSpent)>=0?'var(--green)':'var(--red)'}">${peso(iBgt-iSpent)}</td>
+      <td colspan="2" style="font-size:12px;font-weight:600;color:${barC(iP)}">${iP.toFixed(2)}%</td>
+    </tr>`;
+  });
+  const gs=totalSpent(),gp=pct(gs,TOTAL_BUDGET);
+  html+=`<tr style="background:var(--accent2)">
+    <td colspan="3" style="font-weight:700;font-size:13px;color:#fff">GRAND TOTAL</td>
+    <td class="mono" style="text-align:right;font-weight:700;color:#fff">${peso(TOTAL_BUDGET)}</td>
+    <td class="mono" style="text-align:right;font-weight:700;color:#fff">${peso(gs)}</td>
+    <td class="mono" style="text-align:right;font-weight:700;color:#fff">${peso(TOTAL_BUDGET-gs)}</td>
+    <td colspan="2" style="font-weight:700;color:#fff">${gp.toFixed(2)}%</td>
+  </tr>`;
+  document.getElementById('sum-tbody').innerHTML=html;
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function populateItemDropdowns(){
+  ['m-item','f-item-filter'].forEach(id=>{
+    const sel=document.getElementById(id);
+    const first=id==='m-item'?'<option value="">— Select Budget Item —</option>':'<option value="">All Budget Items</option>';
+    sel.innerHTML=first;
+    BUDGET_ITEMS.forEach(item=>{ const o=document.createElement('option'); o.value=item.id; o.textContent=item.name; sel.appendChild(o); });
+  });
+}
+
+function onItemChange(){
+  const itemId=document.getElementById('m-item').value;
+  const sub=document.getElementById('m-sub');
+  sub.innerHTML='<option value="">— Select Sub-Category —</option>';
+  document.getElementById('m-sub-hint').textContent='';
+  document.getElementById('m-bgt-box').style.display='none';
+  if(!itemId){ sub.disabled=true; return; }
+  const item=findItem(itemId);
+  if(!item){ sub.disabled=true; return; }
+  item.subs.forEach(s=>{ const o=document.createElement('option'); o.value=s.id; o.textContent=s.label; sub.appendChild(o); });
+  sub.disabled=false;
+}
+
+function onSubChange(){
+  const itemId=document.getElementById('m-item').value, subId=document.getElementById('m-sub').value;
+  const box=document.getElementById('m-bgt-box');
+  if(!itemId||!subId){ document.getElementById('m-sub-hint').textContent=''; box.style.display='none'; return; }
+  const item=findItem(itemId), sub=item?findSub(item,subId):null;
+  if(!sub){ box.style.display='none'; return; }
+  document.getElementById('m-sub-hint').textContent='Object of Expenditure: '+sub.type;
+  const spent=subSpent(itemId,subId,editId);
+  document.getElementById('m-bgt-ap').textContent=peso(sub.budget);
+  document.getElementById('m-bgt-sp').textContent=peso(spent);
+  document.getElementById('m-bgt-bl').textContent=peso(sub.budget-spent);
+  box.style.display='block';
+}
+
+function resetModal(){
+  document.getElementById('m-date').value=today();
+  document.getElementById('m-ref').value='';
+  document.getElementById('m-item').value='';
+  document.getElementById('m-sub').innerHTML='<option value="">— Select Sub-Category —</option>';
+  document.getElementById('m-sub').disabled=true;
+  document.getElementById('m-sub-hint').textContent='';
+  document.getElementById('m-bgt-box').style.display='none';
+  document.getElementById('m-amount').value='';
+  document.getElementById('m-desc').value='';
+  document.getElementById('m-status').value='Obligated';
+}
+
+function openAddModal(){
+  editId=null;
+  resetModal();
+  document.getElementById('modal-title').textContent='Add Expense';
+  document.getElementById('modal-save-btn').innerHTML='<i class="ti ti-check"></i>Save Expense';
+  document.getElementById('exp-modal').classList.add('open');
+}
+
+function openEditModal(id){
+  const e=expenses.find(x=>x.id===id); if(!e) return;
+  editId=id;
+  resetModal();
+  document.getElementById('modal-title').textContent='Edit Expense';
+  document.getElementById('modal-save-btn').innerHTML='<i class="ti ti-check"></i>Update Expense';
+  document.getElementById('m-date').value=e.date;
+  document.getElementById('m-ref').value=e.ref||'';
+  document.getElementById('m-item').value=e.itemId;
+  onItemChange();
+  document.getElementById('m-sub').value=e.subId;
+  onSubChange();
+  document.getElementById('m-amount').value=e.amount;
+  document.getElementById('m-desc').value=e.desc;
+  document.getElementById('m-status').value=e.status;
+  document.getElementById('exp-modal').classList.add('open');
+}
+
+function closeModal(){ document.getElementById('exp-modal').classList.remove('open'); editId=null; }
+document.getElementById('exp-modal').addEventListener('click',e=>{ if(e.target===document.getElementById('exp-modal')) closeModal(); });
+
+function saveExpense(){
+  const date  =document.getElementById('m-date').value.trim();
+  const ref   =document.getElementById('m-ref').value.trim();
+  const itemId=document.getElementById('m-item').value;
+  const subId =document.getElementById('m-sub').value;
+  const amount=parseFloat(document.getElementById('m-amount').value);
+  const desc  =document.getElementById('m-desc').value.trim();
+  const status=document.getElementById('m-status').value;
+  if(!date||!itemId||!subId||!amount||isNaN(amount)||!desc){ showToast('Please fill in all required fields.','warning'); return; }
+  if(editId){
+    const idx=expenses.findIndex(e=>e.id===editId);
+    if(idx>-1) expenses[idx]={id:editId,date,ref,itemId,subId,amount,desc,status};
+    showToast('Expense updated successfully!','success');
+  } else {
+    expenses.push({id:uid(),date,ref,itemId,subId,amount,desc,status});
+    showToast('Expense added successfully!','success');
+  }
+  persist(); closeModal(); renderAll();
+}
+
+// ── DELETE ────────────────────────────────────────────────────────────────────
+let pendingCB=null;
+function triggerDelete(id){
+  const e=expenses.find(x=>x.id===id), item=e?findItem(e.itemId):null;
+  document.getElementById('conf-title').textContent='Delete Expense Entry';
+  document.getElementById('conf-msg').innerHTML=`Are you sure you want to delete this record?<br><br>
+    <strong>${e?e.desc:'—'}</strong><br>
+    <span style="color:var(--text2);font-size:12px">${item?item.name:'—'} &nbsp;·&nbsp; ${e?peso(e.amount):''}</span><br><br>
+    This cannot be undone.`;
+  document.getElementById('conf-ok').textContent='Delete';
+  pendingCB=()=>{ expenses=expenses.filter(x=>x.id!==id); persist(); renderAll(); showToast('Expense deleted.','error'); closeConfirm(); };
+  document.getElementById('conf-overlay').classList.add('open');
+}
+
+function triggerClearAll(){
+  document.getElementById('conf-title').textContent='Clear All Expense Data';
+  document.getElementById('conf-msg').innerHTML=`This will permanently delete all <strong>${expenses.length}</strong> expense record(s).<br><br>This cannot be undone.`;
+  document.getElementById('conf-ok').textContent='Clear All';
+  pendingCB=()=>{ expenses=[]; persist(); renderAll(); showToast('All data cleared.','error'); closeConfirm(); };
+  document.getElementById('conf-overlay').classList.add('open');
+}
+
+function closeConfirm(){ document.getElementById('conf-overlay').classList.remove('open'); pendingCB=null; }
+document.getElementById('conf-ok').addEventListener('click',()=>{ if(pendingCB) pendingCB(); });
+document.getElementById('conf-overlay').addEventListener('click',e=>{ if(e.target===document.getElementById('conf-overlay')) closeConfirm(); });
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.nav-btn[data-tab]').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    const id=this.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('tab-'+id).classList.add('active');
+    this.classList.add('active');
+    if(id==='summary')   renderSummary();
+    if(id==='expenses')  renderExpTab();
+    if(id==='dashboard') renderDashboard();
+    if(id==='report')    renderReport();
+  });
+});
+
+// ── EXPORT CSV ────────────────────────────────────────────────────────────────
+function exportCSV(){
+  if(!expenses.length){ showToast('No records to export.','warning'); return; }
+  const hdr='Date,Budget Item,Sub-Category,Object of Expenditure,Description,OR Ref,Amount,Status\n';
+  const rows=expenses.map(e=>{
+    const item=findItem(e.itemId), sub=item?findSub(item,e.subId):null;
+    return [e.date,`"${item?item.name:''}"`,`"${sub?sub.label:''}"`,`"${sub?sub.type:''}"`,`"${e.desc}"`,e.ref||'',e.amount,e.status].join(',');
+  }).join('\n');
+  const blob=new Blob([hdr+rows],{type:'text/csv'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='OACSAS_FY2026_Expenses.csv'; a.click();
+  showToast('CSV exported!','success');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────────────────
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast'), ic=document.getElementById('toast-icon');
+  ic.className=type==='success'?'ti ti-circle-check':type==='warning'?'ti ti-alert-triangle':'ti ti-trash';
+  ic.style.color=type==='success'?'var(--green)':type==='warning'?'var(--amber)':'var(--red)';
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ── REPORTS ───────────────────────────────────────────────────────────────────
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const QUARTERS = ['Q1 (Jan–Mar)','Q2 (Apr–Jun)','Q3 (Jul–Sep)','Q4 (Oct–Dec)'];
+const QUARTER_MONTHS = [[0,1,2],[3,4,5],[6,7,8],[9,10,11]];
+
+function getMonth(e){ return e.date? parseInt(e.date.split('-')[1],10)-1 : -1; }
+function getYear(e){ return e.date? parseInt(e.date.split('-')[0],10) : -1; }
+function qOfMonth(m){ return Math.floor(m/3); }
+
+function populateRptDropdown(){
+  const sel=document.getElementById('rpt-item');
+  if(sel.options.length>1) return;
+  BUDGET_ITEMS.forEach(item=>{ const o=document.createElement('option'); o.value=item.id; o.textContent=item.name; sel.appendChild(o); });
+}
+
+function renderReport(){
+  populateRptDropdown();
+  const yr   = parseInt(document.getElementById('rpt-year').value);
+  const itemF = document.getElementById('rpt-item').value;
+  const statF = document.getElementById('rpt-status').value;
+
+  const filtered = expenses.filter(e=>{
+    if(getYear(e)!==yr) return false;
+    if(itemF && e.itemId!==itemF) return false;
+    if(statF && e.status!==statF) return false;
+    return true;
+  });
+
+  // ─ Monthly totals ─
+  const monthlyTotals = Array(12).fill(0);
+  filtered.forEach(e=>{ const m=getMonth(e); if(m>=0&&m<12) monthlyTotals[m]+=parseFloat(e.amount)||0; });
+
+  // ─ Quarterly totals ─
+  const qTotals = QUARTER_MONTHS.map(ms=>ms.reduce((s,m)=>s+monthlyTotals[m],0));
+  const grandTotal = qTotals.reduce((s,v)=>s+v,0);
+
+  // ─ Approved budget (filtered) ─
+  const approvedBudget = itemF
+    ? BUDGET_ITEMS.find(i=>i.id===itemF)?.subs.reduce((s,sb)=>s+sb.budget,0)||0
+    : TOTAL_BUDGET;
+
+  // ── Q Cards ──────────────────────────────────────────────────────────────
+  const qCardColors = ['#3b82f6','#14b8a6','#a855f7','#f59e0b'];
+  document.getElementById('rpt-q-cards').innerHTML = QUARTERS.map((ql,qi)=>{
+    const amt=qTotals[qi];
+    const qBgt=approvedBudget/4;
+    const p=qBgt>0?Math.min(100,(amt/qBgt)*100):0;
+    const col=barC(p);
+    return `<div class="q-card">
+      <div class="q-card-label" style="color:${qCardColors[qi]}">${ql}</div>
+      <div class="q-card-amount" style="color:${col}">${peso(amt)}</div>
+      <div class="q-card-pct">${p.toFixed(1)}% of quarterly target</div>
+      <div class="q-util-track"><div class="q-util-fill" style="width:${p.toFixed(1)}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+
+  // ── Quarterly Table by Budget Item ───────────────────────────────────────
+  const items = itemF ? BUDGET_ITEMS.filter(i=>i.id===itemF) : BUDGET_ITEMS;
+  let qRows='', qFootArr=[0,0,0,0];
+  items.forEach(item=>{
+    const iBgt = item.subs.reduce((s,sb)=>s+sb.budget,0);
+    const qAmts = QUARTER_MONTHS.map(ms=>ms.reduce((s,m)=>{
+      const mo=m+1;
+      return s+filtered.filter(e=>e.itemId===item.id&&getMonth(e)===m).reduce((a,e)=>a+parseFloat(e.amount),0);
+    },0));
+    const iTotal=qAmts.reduce((s,v)=>s+v,0);
+    qAmts.forEach((v,i)=>qFootArr[i]+=v);
+    const iP=iBgt>0?Math.min(100,(iTotal/iBgt)*100):0;
+    const col=barC(iP);
+    qRows+=`<tr>
+      <td style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--text);max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.name}</td>
+      ${qAmts.map(v=>`<td style="color:${v>0?'var(--text)':'var(--text3)'}">${peso(v)}</td>`).join('')}
+      <td style="color:${col};font-weight:600">${peso(iTotal)}</td>
+      <td>${peso(iBgt)}</td>
+      <td><span class="util-pill" style="background:${col}22;color:${col}">${iP.toFixed(1)}%</span></td>
+    </tr>`;
+  });
+  document.getElementById('rpt-q-tbody').innerHTML=qRows||`<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--text3)">No data for the selected filters.</td></tr>`;
+
+  const footTotal=qFootArr.reduce((s,v)=>s+v,0);
+  const footP=approvedBudget>0?Math.min(100,(footTotal/approvedBudget)*100):0;
+  qFootArr.forEach((v,i)=>{ document.getElementById(`rpt-q-tot${i+1}`).textContent=peso(v); });
+  document.getElementById('rpt-q-tot-all').textContent=peso(footTotal);
+  document.getElementById('rpt-q-bgt-all').textContent=peso(approvedBudget);
+  document.getElementById('rpt-q-util-all').innerHTML=`<span style="color:${barC(footP)};font-weight:700">${footP.toFixed(1)}%</span>`;
+
+  // ── Monthly Table (Budget Items × Months) ─────────────────────────────────
+  const mHead=document.getElementById('rpt-monthly-head');
+  const mBody=document.getElementById('rpt-monthly-tbody');
+  const mFoot=document.getElementById('rpt-monthly-foot');
+
+  mHead.innerHTML=`<tr><th>Budget Item</th>${MONTHS.map(m=>`<th>${m}</th>`).join('')}<th>Total</th></tr>`;
+
+  const mFootArr=Array(12).fill(0);
+  let mRows='';
+  items.forEach(item=>{
+    const mAmts=Array(12).fill(0);
+    filtered.filter(e=>e.itemId===item.id).forEach(e=>{ const m=getMonth(e); if(m>=0) mAmts[m]+=parseFloat(e.amount)||0; });
+    mAmts.forEach((v,i)=>mFootArr[i]+=v);
+    const iTotal=mAmts.reduce((s,v)=>s+v,0);
+    mRows+=`<tr>
+      <td style="font-family:'DM Sans',sans-serif;font-size:11.5px;color:var(--text);max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${item.name}</td>
+      ${mAmts.map(v=>`<td style="font-size:11.5px;color:${v>0?'var(--text)':'var(--text3)'}">${v>0?peso(v):'—'}</td>`).join('')}
+      <td style="font-weight:600;color:${grandTotal>0&&iTotal>0?'var(--amber)':'var(--text3)'}">${iTotal>0?peso(iTotal):'—'}</td>
+    </tr>`;
+  });
+  mBody.innerHTML=mRows||`<tr><td colspan="14" style="text-align:center;padding:2rem;color:var(--text3)">No data for the selected filters.</td></tr>`;
+
+  const mGrand=mFootArr.reduce((s,v)=>s+v,0);
+  mFoot.innerHTML=`<tr>
+    <td style="font-family:'DM Sans',sans-serif;font-weight:700">TOTAL</td>
+    ${mFootArr.map((v,i)=>`<td style="font-weight:700;color:${v>0?barC(pct(v,approvedBudget/12)):'var(--text3)'}">${v>0?peso(v):'—'}</td>`).join('')}
+    <td style="font-weight:700;color:var(--red)">${peso(mGrand)}</td>
+  </tr>`;
+
+  // ── Monthly Bar Chart ─────────────────────────────────────────────────────
+  const maxM=Math.max(...monthlyTotals,1);
+  document.getElementById('rpt-monthly-chart').innerHTML=MONTHS.map((ml,i)=>{
+    const v=monthlyTotals[i], w=((v/maxM)*100).toFixed(1);
+    const col=v>0?'#3b82f6':'rgba(255,255,255,.08)';
+    return `<div class="bc-row">
+      <div class="bc-label">${ml}</div>
+      <div class="bc-track"><div class="bc-fill" style="width:${w}%;background:${col}">${v>0&&w>15?peso(v).replace('₱',''):''}</div></div>
+      <div class="bc-val">${v>0?peso(v):'—'}</div>
+    </div>`;
+  }).join('');
+
+  // ── Quarterly Utilization Bar Chart ───────────────────────────────────────
+  const qBgtPerQ=approvedBudget/4;
+  const qPcts=qTotals.map(v=>qBgtPerQ>0?Math.min(100,(v/qBgtPerQ)*100):0);
+  const qColors=['#3b82f6','#14b8a6','#a855f7','#f59e0b'];
+  document.getElementById('rpt-q-chart').innerHTML=QUARTERS.map((ql,qi)=>{
+    const p=qPcts[qi], col=barC(p), labelCol=qColors[qi];
+    return `<div class="bc-row">
+      <div class="bc-label" style="color:${labelCol};width:90px">Q${qi+1}</div>
+      <div class="bc-track"><div class="bc-fill" style="width:${p.toFixed(1)}%;background:${col}">${p>15?p.toFixed(1)+'%':''}</div></div>
+      <div class="bc-val" style="color:${col}">${p.toFixed(1)}%</div>
+    </div>
+    <div style="font-size:10.5px;color:var(--text3);padding-left:100px;margin-top:-4px;margin-bottom:4px">${peso(qTotals[qi])} of ${peso(qBgtPerQ)} target</div>`;
+  }).join('');
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+populateItemDropdowns();
+renderAll();
+</script>
+</body>
+</html>

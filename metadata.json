@@ -1,0 +1,6 @@
+{
+  "name": "OACSAS WFP Budget & Supplies Management System",
+  "description": "Integrated Office Work and Financial Plan (WFP) budget monitoring, expense tracking, office supplies inventory, automated procurement requests, RIS generation, and audit reporting with Supabase & RBAC authentication.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

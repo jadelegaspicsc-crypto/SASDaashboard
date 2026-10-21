@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Office Supplies Tracker</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/webfont/tabler-icons.min.css" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --bg2: #181c25; --bg3: #1e2330;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.12);
+    --text: #e8eaf0; --text2: #8b92a5; --text3: #5a6278;
+    --accent: #3b82f6; --accent-dim: rgba(59,130,246,0.15);
+    --sidebar-w: 215px; --radius: 12px; --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  }
+  body { font-family:'Segoe UI',system-ui,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; display:flex; font-size:14px; line-height:1.5; }
+
+  /* SIDEBAR */
+  #sidebar { width:var(--sidebar-w); min-height:100vh; background:var(--bg2); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; position:sticky; top:0; align-self:flex-start; height:100vh; overflow-y:auto; }
+  .sidebar-brand { padding:1.4rem 1.25rem 1rem; border-bottom:1px solid var(--border); }
+  .brand-name { font-size:12px; font-weight:600; color:var(--accent); letter-spacing:.8px; text-transform:uppercase; }
+  .brand-sub  { font-size:11px; color:var(--text3); margin-top:2px; }
+  .nav-list { padding:.5rem 0; flex:1; }
+  .nav-section { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:.8px; padding:10px 1.25rem 4px; }
+  .nav-btn { display:flex; align-items:center; gap:10px; width:100%; padding:9px 1.25rem; background:none; border:none; border-left:2px solid transparent; cursor:pointer; color:var(--text2); font-size:13.5px; text-align:left; transition:all .15s; }
+  .nav-btn:hover { background:rgba(255,255,255,0.04); color:var(--text); }
+  .nav-btn.active { background:var(--accent-dim); border-left-color:var(--accent); color:var(--accent); font-weight:500; }
+  .nav-btn i { font-size:16px; flex-shrink:0; }
+
+  /* MAIN */
+  #main { flex:1; padding:1.5rem; overflow-x:hidden; min-width:0; }
+  .tab { display:none; } .tab.active { display:block; }
+
+  /* PAGE HEADER */
+  .page-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:10px; }
+  .page-title { font-size:22px; font-weight:500; }
+  .page-sub   { font-size:13px; color:var(--text2); margin-top:2px; }
+
+  /* HERO */
+  .hero { background:linear-gradient(135deg,#042C53 0%,#0C447C 45%,#185FA5 100%); border-radius:16px; padding:1.75rem 2rem; margin-bottom:1.5rem; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-40px; right:-40px; width:180px; height:180px; border-radius:50%; background:rgba(255,255,255,0.05); }
+  .hero::after  { content:''; position:absolute; bottom:-30px; right:80px; width:100px; height:100px; border-radius:50%; background:rgba(255,255,255,0.04); }
+  .hero-inner { position:relative; z-index:1; }
+  .hero-top { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .hero-label { font-size:11px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .hero-title { font-size:26px; font-weight:500; color:#fff; margin-bottom:6px; }
+  .hero-date  { font-size:13px; color:rgba(255,255,255,0.6); }
+  .hero-alert { background:rgba(255,255,255,0.1); border:.5px solid rgba(255,255,255,0.15); border-radius:12px; padding:12px 20px; text-align:center; min-width:90px; }
+  .hero-alert-label { font-size:10px; color:rgba(255,255,255,0.5); text-transform:uppercase; letter-spacing:.5px; margin-bottom:2px; }
+  .hero-alert-num { font-size:32px; font-weight:500; }
+  .hero-alert-sub { font-size:11px; color:rgba(255,255,255,0.45); margin-top:2px; }
+  .hero-budget { margin-top:1.25rem; }
+  .hero-budget-row { display:flex; justify-content:space-between; margin-bottom:6px; }
+  .hero-budget-label { font-size:12px; color:rgba(255,255,255,0.6); }
+  .hero-bar-wrap { background:rgba(255,255,255,0.12); border-radius:999px; height:6px; overflow:hidden; }
+  .hero-bar { height:100%; border-radius:999px; transition:width .6s ease; }
+  .hero-budget-subs { display:flex; justify-content:space-between; margin-top:5px; }
+  .hero-budget-subs span { font-size:11px; color:rgba(255,255,255,0.4); }
+
+  /* METRIC CARDS */
+  .metric-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(155px,1fr)); gap:12px; margin-bottom:1.5rem; }
+  .metric-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.1rem; display:flex; flex-direction:column; gap:10px; }
+  .metric-top  { display:flex; align-items:center; justify-content:space-between; }
+  .metric-label { font-size:11px; color:var(--text2); text-transform:uppercase; letter-spacing:.4px; }
+  .metric-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+  .metric-value { font-size:22px; font-weight:500; margin-bottom:2px; }
+  .metric-sub   { font-size:11px; color:var(--text2); }
+
+  /* PANELS */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:1rem; }
+  .panel { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .panel-head { padding:.875rem 1.1rem; display:flex; align-items:center; gap:8px; border-bottom:1px solid var(--border); font-size:13px; font-weight:500; }
+  .panel-head i { font-size:16px; }
+  .panel-head .count-badge { margin-left:auto; border-radius:999px; font-size:11px; font-weight:600; padding:1px 8px; }
+  .panel-body { padding:.5rem 1.1rem; }
+  .panel-empty { text-align:center; padding:1.5rem 0; color:var(--text2); }
+  .panel-empty i { font-size:24px; display:block; margin-bottom:6px; }
+  .panel-empty p { font-size:13px; margin:0; }
+  .panel-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; }
+  .panel-row + .panel-row { border-top:1px solid var(--border); }
+  .panel-row-name { font-size:13px; font-weight:500; color:var(--text); }
+  .panel-row-sub  { font-size:11px; color:var(--text2); margin-top:1px; }
+  .iss-row { padding:8px 0; } .iss-row + .iss-row { border-top:1px solid var(--border); }
+  .iss-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:3px; }
+  .iss-meta { font-size:11px; color:var(--text2); }
+
+  /* RECORD CARDS */
+  .record-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:1rem 1.25rem; margin-bottom:1rem; }
+  .record-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .record-head-left { display:flex; align-items:center; gap:10px; }
+
+  /* TABLES */
+  .tbl-wrap { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  thead tr { background:var(--bg3); }
+  th { text-align:left; padding:10px 12px; font-weight:500; color:var(--text2); font-size:12px; white-space:nowrap; }
+  tbody tr { border-top:1px solid var(--border); }
+  tbody tr:hover { background:rgba(255,255,255,0.02); }
+  td { padding:10px 12px; color:var(--text); vertical-align:middle; }
+  td.muted { color:var(--text2); }
+  .alt-row { background:rgba(255,255,255,0.015); }
+
+  /* BADGES */
+  .badge { display:inline-block; font-size:11px; font-weight:500; padding:2px 8px; border-radius:999px; white-space:nowrap; }
+  .badge-blue   { background:rgba(59,130,246,.15);  color:#60a5fa; }
+  .badge-green  { background:rgba(34,197,94,.13);   color:#4ade80; }
+  .badge-amber  { background:rgba(245,158,11,.13);  color:#fbbf24; }
+  .badge-red    { background:rgba(239,68,68,.13);   color:#f87171; }
+  .badge-purple { background:rgba(167,139,250,.13); color:#c4b5fd; }
+  .badge-teal   { background:rgba(20,184,166,.13);  color:#2dd4bf; }
+  .badge-gray   { background:rgba(255,255,255,.07); color:var(--text2); }
+
+  /* BUTTONS */
+  .btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:8px; font-size:13.5px; font-weight:500; cursor:pointer; border:none; transition:opacity .15s; }
+  .btn:hover { opacity:.85; }
+  .btn-primary   { background:var(--accent); color:#fff; }
+  .btn-secondary { background:rgba(255,255,255,0.06); color:var(--text); border:1px solid var(--border2); }
+  .btn-teal      { background:rgba(20,184,166,.18); color:#2dd4bf; border:1px solid rgba(20,184,166,.25); }
+  .btn-danger    { background:none; color:#ef4444; border:1px solid rgba(239,68,68,.3); padding:5px 10px; font-size:13px; }
+  .btn-sm        { padding:4px 10px; font-size:12px; }
+
+  /* YEAR PILL */
+  .year-pill { display:inline-flex; align-items:center; gap:6px; background:rgba(20,184,166,.13); color:#2dd4bf; border:1px solid rgba(20,184,166,.25); border-radius:999px; padding:4px 14px; font-size:13px; font-weight:500; }
+
+  /* INPUTS */
+  .filter-row { display:flex; gap:8px; margin-bottom:1rem; flex-wrap:wrap; }
+  input, select { background:var(--bg3); border:1px solid var(--border2); border-radius:8px; color:var(--text); font-size:13.5px; padding:7px 11px; outline:none; transition:border-color .15s; width:100%; }
+  input:focus, select:focus { border-color:var(--accent); }
+  input::placeholder { color:var(--text3); }
+  select option { background:var(--bg3); }
+  .input-wrap { margin-bottom:1rem; }
+  .input-wrap label { font-size:12.5px; color:var(--text2); display:block; margin-bottom:4px; }
+
+  /* INFO BOX */
+  .info-box { background:rgba(20,184,166,.07); border:1px solid rgba(20,184,166,.2); border-radius:10px; padding:10px 14px; font-size:12.5px; color:#81e6d9; display:flex; gap:8px; align-items:flex-start; margin-bottom:1rem; }
+  .info-box i { font-size:15px; flex-shrink:0; margin-top:1px; }
+
+  /* MODAL */
+  .modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(4px); z-index:1000; align-items:flex-start; justify-content:center; overflow-y:auto; padding:2rem 1rem; }
+  .modal-backdrop.open { display:flex; }
+  .modal-box { background:var(--bg2); border:1px solid var(--border2); border-radius:16px; width:100%; max-width:620px; padding:1.5rem; box-shadow:var(--shadow); animation:pop .2s ease; }
+  @keyframes pop { from{transform:scale(.96);opacity:0} to{transform:scale(1);opacity:1} }
+  .modal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; }
+  .modal-title  { font-size:17px; font-weight:500; }
+  .modal-close  { background:none; border:none; cursor:pointer; font-size:22px; color:var(--text2); line-height:1; padding:0 4px; }
+  .modal-close:hover { color:var(--text); }
+  .modal-footer { display:flex; gap:8px; justify-content:flex-end; margin-top:1.25rem; }
+  .form-grid-2  { display:grid; grid-template-columns:1fr 1fr; gap:0 1rem; }
+  .form-full    { grid-column:1/-1; }
+
+  /* ITEM ROWS */
+  .item-row   { display:grid; gap:8px; margin-bottom:8px; align-items:center; }
+  .item-row-3 { grid-template-columns:2fr 1fr auto; }
+
+  /* TOTAL PREVIEW */
+  .total-preview { background:var(--bg3); border-radius:8px; padding:10px 14px; margin-top:1rem; font-size:13px; color:var(--text2); }
+  .total-preview strong { color:var(--text); }
+
+  /* BUDGET BAR */
+  .budget-util-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; margin-bottom:1.5rem; }
+  .budget-util-top  { display:flex; justify-content:space-between; margin-bottom:10px; font-size:14px; font-weight:500; }
+  .bar-wrap { background:var(--bg3); border-radius:999px; height:12px; overflow:hidden; }
+  .bar      { height:100%; border-radius:999px; transition:width .5s ease; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align:center; padding:3rem; color:var(--text2); }
+  .empty-state i { font-size:36px; display:block; margin-bottom:10px; opacity:.4; }
+  .empty-state p { font-size:13px; margin:0; }
+
+  /* NO PRICE NOTICE */
+  .no-price { font-size:12px; color:#fbbf24; display:inline-flex; align-items:center; gap:4px; }
+
+  ::-webkit-scrollbar { width:6px; height:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:3px; }
+
+  /* REPORT: switchTab hook for reports */
+  #tab-reports .btn { cursor: pointer; }
+
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-name">OAC-SAS</div>
+    <div class="brand-sub" style="font-size:10px;line-height:1.4;color:var(--text3);margin-top:3px">Office of the Assistant Commissioner for Support and Administrative Services</div>
+    <div class="brand-sub" style="margin-top:6px">Office Supplies Tracker</div>
+  </div>
+  <div class="nav-list">
+    <div class="nav-section">Main</div>
+    <button class="nav-btn active" onclick="switchTab('dashboard',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</button>
+    <button class="nav-btn" onclick="switchTab('inventory',this)"><i class="ti ti-package"></i>Inventory</button>
+    <div class="nav-section">Transactions</div>
+    <button class="nav-btn" onclick="switchTab('restock',this)"><i class="ti ti-truck-delivery"></i>Restocking</button>
+    <button class="nav-btn" onclick="switchTab('issuance',this)"><i class="ti ti-clipboard-list"></i>Issuance</button>
+    <div class="nav-section">Reference</div>
+    <button class="nav-btn" onclick="switchTab('pricelist',this)"><i class="ti ti-tags"></i>Price List</button>
+    <button class="nav-btn" onclick="switchTab('budget',this)"><i class="ti ti-wallet"></i>Budget</button>
+    <button class="nav-btn" onclick="switchTab('reports',this)"><i class="ti ti-printer"></i>Reports</button>
+    <button class="nav-btn" onclick="switchTab('ris',this)"><i class="ti ti-file-text"></i>RIS Generator</button>
+  </div>
+</nav>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- DASHBOARD -->
+  <div id="tab-dashboard" class="tab active">
+    <div class="hero">
+      <div class="hero-inner">
+        <div class="hero-top">
+          <div>
+            <div class="hero-label">Office Supplies</div>
+            <div class="hero-title">Supply Dashboard</div>
+            <div class="hero-date" id="hero-date"></div>
+          </div>
+          <div class="hero-alert">
+            <div class="hero-alert-label">Low Stock Alert</div>
+            <div class="hero-alert-num" id="hero-low-num">0</div>
+            <div class="hero-alert-sub" id="hero-low-sub">items</div>
+          </div>
+        </div>
+        <div class="hero-budget">
+          <div class="hero-budget-row">
+            <span class="hero-budget-label" id="hero-budget-label">Annual Budget</span>
+            <span class="hero-budget-label" id="hero-pct-label">0% used</span>
+          </div>
+          <div class="hero-bar-wrap"><div class="hero-bar" id="hero-bar" style="width:0%;background:#5DCAA5"></div></div>
+          <div class="hero-budget-subs">
+            <span id="hero-spent">Spent: ₱0</span>
+            <span id="hero-rem">Remaining: ₱0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="metric-grid" id="metric-grid"></div>
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-head" style="background:rgba(245,158,11,.1);color:#fbbf24;border-bottom-color:rgba(245,158,11,.2)">
+          <i class="ti ti-alert-triangle"></i> Low Stock Items
+          <span class="count-badge" id="low-badge" style="background:#f59e0b;color:#1a0e00;display:none"></span>
+        </div>
+        <div class="panel-body" id="low-panel-body"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head" style="background:rgba(59,130,246,.1);color:#60a5fa;border-bottom-color:rgba(59,130,246,.2)">
+          <i class="ti ti-clipboard-list"></i> Recent Issuances
+        </div>
+        <div class="panel-body" id="iss-panel-body"></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head" style="background:var(--bg3)"><i class="ti ti-truck-delivery" style="color:var(--text2)"></i> Recent Restocking</div>
+      <div id="restock-panel-wrap"></div>
+    </div>
+  </div>
+
+  <!-- INVENTORY -->
+  <div id="tab-inventory" class="tab">
+    <div class="page-header">
+      <div><h1 class="page-title">Inventory</h1><div class="page-sub">Stock quantities — prices are managed in Price List</div></div>
+      <button class="btn btn-primary" onclick="openModal('inv')"><i class="ti ti-plus"></i> Add Item</button>
+    </div>
+    <div class="filter-row">
+      <input type="text" id="inv-search" placeholder="Search item…" style="max-width:220px" oninput="renderInventoryTable()">
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Item Name</th><th>Unit</th><th>Qty</th><th>Min Stock</th><th>Current Price</th><th>Status</th><th></th></tr></thead>
+        <tbody id="inv-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- RESTOCKING -->
+  <div id="tab-restock" class="tab">
+    <div class="page-header">
+      <div><h1 class="page-title">Restocking Records</h1><div class="page-sub">Prices auto-filled from the Price List</div></div>
+      <button class="btn btn-primary" onclick="openModal('restock')"><i class="ti ti-plus"></i> New Restock</button>
+    </div>
+    <div id="restock-list"></div>
+  </div>
+
+  <!-- ISSUANCE -->
+  <div id="tab-issuance" class="tab">
+    <div class="page-header">
+      <div><h1 class="page-title">Issuance / Requests</h1><div class="page-sub">Supplies released to officemates</div></div>
+      <button class="btn btn-primary" onclick="openModal('iss')"><i class="ti ti-plus"></i> New Issuance</button>
+    </div>
+    <div id="iss-list"></div>
+  </div>
+
+  <!-- PRICE LIST -->
+  <div id="tab-pricelist" class="tab">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Price List</h1>
+        <div class="page-sub">Master reference — unit prices used by Restocking records</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div class="year-pill"><i class="ti ti-calendar"></i><span id="pl-current-year"></span></div>
+        <button class="btn btn-teal" onclick="openModal('pl')"><i class="ti ti-plus"></i> Add / Update Price</button>
+      </div>
+    </div>
+    <div class="info-box">
+      <i class="ti ti-info-circle"></i>
+      <div>
+        Prices here are the <strong>current reference prices</strong> for all supply items.
+        When you create a Restocking record, unit costs are automatically filled from this list.
+        Update prices here whenever costs change (e.g. yearly) — past restocking records keep their recorded cost unchanged.
+      </div>
+    </div>
+    <div class="filter-row">
+      <input type="text" id="pl-search" placeholder="Search item…" style="max-width:220px" oninput="renderPriceList()">
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Item Name</th><th>Unit</th><th>Unit Price (₱)</th><th>Last Updated</th><th></th></tr></thead>
+        <tbody id="pl-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BUDGET -->
+  <div id="tab-budget" class="tab">
+    <div class="page-header">
+      <div><h1 class="page-title">Budget</h1><div class="page-sub">Annual allocation &amp; expense tracking</div></div>
+      <button class="btn btn-secondary" onclick="openModal('budget')"><i class="ti ti-edit"></i> Edit Budget</button>
+    </div>
+    <div class="metric-grid" id="budget-metric-grid"></div>
+    <div class="budget-util-card">
+      <div class="budget-util-top"><span>Budget Utilization</span><span id="budget-pct-label" style="color:var(--text2)">0%</span></div>
+      <div class="bar-wrap"><div class="bar" id="budget-bar" style="width:0%;background:#22c55e"></div></div>
+    </div>
+    <h2 style="font-size:16px;font-weight:500;margin-bottom:.75rem">Restocking Expenses</h2>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Request ID</th><th>Date</th><th>Items</th><th>Amount</th></tr></thead>
+        <tbody id="budget-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+  <div id="tab-reports" class="tab">
+    <div class="page-header">
+      <div><h1 class="page-title">Reports</h1><div class="page-sub">Generate printable reports for inventory, restocking, and issuance</div></div>
+    </div>
+    <!-- Report type selector cards -->
+    <div id="report-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1rem;margin-bottom:1.5rem">
+      <div class="rpt-card" onclick="showReport('inventory')" style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.4rem;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#3b82f6'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(59,130,246,.14);display:flex;align-items:center;justify-content:center;margin-bottom:12px"><i class="ti ti-package" style="font-size:20px;color:#60a5fa"></i></div>
+        <div style="font-size:15px;font-weight:500;margin-bottom:4px">Inventory Report</div>
+        <div style="font-size:12px;color:var(--text2)">Full stock listing with status and current prices</div>
+        <div style="margin-top:12px;display:flex;gap:6px">
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();printReport('inventory')"><i class="ti ti-printer"></i> Print</button>
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showReport('inventory')"><i class="ti ti-eye"></i> Preview</button>
+        </div>
+      </div>
+      <div class="rpt-card" onclick="showReport('restock')" style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.4rem;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#a78bfa'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(167,139,250,.14);display:flex;align-items:center;justify-content:center;margin-bottom:12px"><i class="ti ti-truck-delivery" style="font-size:20px;color:#c4b5fd"></i></div>
+        <div style="font-size:15px;font-weight:500;margin-bottom:4px">Restocking Report</div>
+        <div style="font-size:12px;color:var(--text2)">All restocking records with itemized costs</div>
+        <div style="margin-top:12px;display:flex;gap:6px">
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();printReport('restock')"><i class="ti ti-printer"></i> Print</button>
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showReport('restock')"><i class="ti ti-eye"></i> Preview</button>
+        </div>
+      </div>
+      <div class="rpt-card" onclick="showReport('issuance')" style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.4rem;cursor:pointer;transition:border-color .15s" onmouseover="this.style.borderColor='#4ade80'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)'">
+        <div style="width:40px;height:40px;border-radius:10px;background:rgba(34,197,94,.12);display:flex;align-items:center;justify-content:center;margin-bottom:12px"><i class="ti ti-clipboard-list" style="font-size:20px;color:#4ade80"></i></div>
+        <div style="font-size:15px;font-weight:500;margin-bottom:4px">Issuance Report</div>
+        <div style="font-size:12px;color:var(--text2)">All issuance records per requester</div>
+        <div style="margin-top:12px;display:flex;gap:6px">
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();printReport('issuance')"><i class="ti ti-printer"></i> Print</button>
+          <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showReport('issuance')"><i class="ti ti-eye"></i> Preview</button>
+        </div>
+      </div>
+    </div>
+    <!-- Preview area -->
+    <div id="rpt-preview-wrap" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+        <span style="font-size:14px;font-weight:500;color:var(--text2)">Preview</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary btn-sm" id="rpt-print-btn" onclick="printReport(currentReport)"><i class="ti ti-printer"></i> Print / Save PDF</button>
+          <button class="btn btn-secondary btn-sm" onclick="document.getElementById('rpt-preview-wrap').style.display='none'"><i class="ti ti-x"></i> Close</button>
+        </div>
+      </div>
+      <div id="rpt-preview-frame" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.5)"></div>
+    </div>
+  </div>
+
+
+  <!-- RIS GENERATOR -->
+  <div id="tab-ris" class="tab">
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">RIS Generator</h1>
+        <div class="page-sub">Requisition and Issue Slip — Appendix 63 · General Services Division</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-secondary" onclick="risPreview()"><i class="ti ti-eye"></i> Preview</button>
+        <button class="btn btn-primary" onclick="risPrint()"><i class="ti ti-printer"></i> Print RIS</button>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <i class="ti ti-info-circle"></i>
+      <span>Fill in the header details, select items from the Price List, then click <strong>Print RIS</strong> to generate the official Appendix 63 form. The <em>Stock Available?</em>, <em>Quantity Issued</em>, and signatory fields for <em>Issued by / Received by</em> will be completed by the General Services Division.</span>
+    </div>
+
+    <!-- Header Info -->
+    <div class="panel" style="margin-bottom:1rem">
+      <div class="panel-head"><i class="ti ti-building"></i> Office / Entity Information</div>
+      <div class="panel-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 1.25rem">
+          <div class="input-wrap">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Entity Name</label>
+            <input type="text" id="ris-entity" placeholder="e.g. Commission on Audit" />
+          </div>
+          <div class="input-wrap">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Fund Cluster</label>
+            <input type="text" id="ris-fund" placeholder="e.g. 01" />
+          </div>
+          <div class="input-wrap">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Division</label>
+            <input type="text" id="ris-division" placeholder="e.g. Support and Administrative Services" />
+          </div>
+          <div class="input-wrap">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Responsibility Center Code</label>
+            <input type="text" id="ris-respcode" placeholder="e.g. 1-01-000" />
+          </div>
+          <div class="input-wrap">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Office</label>
+            <input type="text" id="ris-office" placeholder="e.g. Office of the Assistant Commissioner" />
+          </div>
+          <div class="input-wrap">
+            <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">RIS No.</label>
+            <input type="text" id="ris-no" placeholder="e.g. RIS-2026-001" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Items -->
+    <div class="panel" style="margin-bottom:1rem">
+      <div class="panel-head"><i class="ti ti-list-details"></i> Requisition Items</div>
+      <div class="panel-body">
+        <div class="tbl-wrap" style="margin-bottom:.75rem">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:130px">Stock No.</th>
+                <th style="width:90px">Unit</th>
+                <th>Description</th>
+                <th style="width:100px;text-align:center">Qty Requested</th>
+                <th style="width:40px"></th>
+              </tr>
+            </thead>
+            <tbody id="ris-items-tbody"></tbody>
+          </table>
+        </div>
+        <button class="btn btn-secondary" style="font-size:13px" onclick="risAddRow()"><i class="ti ti-plus"></i> Add Item</button>
+      </div>
+    </div>
+
+    <!-- Purpose & Signatories -->
+    <div class="panel" style="margin-bottom:1rem">
+      <div class="panel-head"><i class="ti ti-pencil"></i> Purpose &amp; Signatories</div>
+      <div class="panel-body">
+        <div class="input-wrap">
+          <label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Purpose</label>
+          <textarea id="ris-purpose" rows="2" style="resize:vertical;min-height:52px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13.5px;padding:8px 12px;outline:none;width:100%;font-family:inherit" placeholder="State the purpose of this requisition…"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 1.25rem;margin-top:.25rem">
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem;padding-bottom:5px;border-bottom:1px solid var(--border)">Requested by</div>
+            <div class="input-wrap"><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Printed Name</label><input type="text" id="ris-req-name" placeholder="Full name" /></div>
+            <div class="input-wrap"><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Designation</label><input type="text" id="ris-req-desig" placeholder="Position / title" /></div>
+            <div class="input-wrap"><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Date</label><input type="date" id="ris-req-date" /></div>
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem;padding-bottom:5px;border-bottom:1px solid var(--border)">Approved by</div>
+            <div class="input-wrap"><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Printed Name</label><input type="text" id="ris-appr-name" placeholder="Full name" /></div>
+            <div class="input-wrap"><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Designation</label><input type="text" id="ris-appr-desig" placeholder="Position / title" /></div>
+            <div class="input-wrap"><label style="font-size:12px;color:var(--text2);display:block;margin-bottom:5px">Date</label><input type="date" id="ris-appr-date" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:2rem">
+      <button class="btn btn-primary" onclick="risPrint()"><i class="ti ti-printer"></i> Generate &amp; Print RIS</button>
+      <button class="btn btn-secondary" onclick="risPreview()"><i class="ti ti-eye"></i> Preview</button>
+      <button class="btn btn-danger" style="padding:8px 16px;font-size:13.5px" onclick="risClear()"><i class="ti ti-trash"></i> Clear All</button>
+    </div>
+  </div>
+
+</main>
+
+<!-- MODAL: Inventory -->
+<div class="modal-backdrop" id="modal-inv">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="inv-modal-title">Add Inventory Item</h2>
+      <button class="modal-close" onclick="closeModal('inv')">×</button>
+    </div>
+    <div class="info-box">
+      <i class="ti ti-info-circle"></i>
+      <div>Item prices are managed separately in the <strong>Price List</strong> tab. Inventory only tracks stock quantities.</div>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-full input-wrap">
+        <label>Item Name <span style="color:var(--text3);font-size:11px">(from Price List)</span></label>
+        <select id="inv-name" onchange="onInvNameChange()">
+          <option value="">— Select item —</option>
+        </select>
+      </div>
+      <div class="input-wrap">
+        <label>Unit <span style="color:var(--text3);font-size:11px">(auto-filled)</span></label>
+        <input id="inv-unit" placeholder="—" readonly style="opacity:.7;cursor:default">
+      </div>
+      <div class="input-wrap"><label>Current Quantity</label><input id="inv-qty" type="number" min="0"></div>
+      <div class="input-wrap"><label>Min Stock (low-stock threshold)</label><input id="inv-min" type="number" min="0"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('inv')">Cancel</button>
+      <button class="btn btn-primary" id="inv-save-btn" onclick="saveInventory()">Add Item</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Price List -->
+<div class="modal-backdrop" id="modal-pl">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="pl-modal-title">Add Item to Price List</h2>
+      <button class="modal-close" onclick="closeModal('pl')">×</button>
+    </div>
+    <div class="form-grid-2">
+      <div class="form-full input-wrap" id="pl-name-wrap">
+        <label>Item Name</label>
+        <input id="pl-item-name" placeholder="e.g. Ballpen" autocomplete="off">
+      </div>
+      <div class="input-wrap">
+        <label>Unit</label>
+        <input id="pl-unit" list="pl-unit-list" placeholder="e.g. pc, box, ream" autocomplete="off">
+        <datalist id="pl-unit-list"></datalist>
+      </div>
+      <div class="form-full input-wrap"><label>Unit Price (₱)</label><input id="pl-price" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('pl')">Cancel</button>
+      <button class="btn btn-teal" id="pl-save-btn" onclick="savePriceItem()">Save Price</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Restock -->
+<div class="modal-backdrop" id="modal-restock">
+  <div class="modal-box" style="max-width:680px">
+    <div class="modal-header">
+      <h2 class="modal-title" id="restock-modal-title">New Restocking Record</h2>
+      <button class="modal-close" onclick="closeModal('restock')">×</button>
+    </div>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:1rem">Request ID auto-generated. Prices pulled from the Price List.</p>
+
+    <!-- Reference / RIS section -->
+    <div style="background:rgba(20,184,166,.07);border:1px solid rgba(20,184,166,.2);border-radius:10px;padding:1rem 1.1rem;margin-bottom:1.1rem">
+      <div style="font-size:12px;font-weight:600;color:#2dd4bf;text-transform:uppercase;letter-spacing:.5px;margin-bottom:.75rem;display:flex;align-items:center;gap:6px">
+        <i class="ti ti-file-description" style="font-size:15px"></i> Reference Document
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 1rem">
+        <div class="input-wrap" style="margin-bottom:.75rem">
+          <label>Document Type</label>
+          <select id="restock-doc-type">
+            <option value="RIS">Requisition and Issuance Slip (RIS)</option>
+            <option value="PO">Purchase Order (PO)</option>
+            <option value="DR">Delivery Receipt (DR)</option>
+            <option value="SI">Sales Invoice (SI)</option>
+            <option value="OR">Official Receipt (OR)</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="input-wrap" style="margin-bottom:.75rem">
+          <label>Reference / Control Number</label>
+          <input id="restock-ref-num" placeholder="e.g. RIS-2026-001">
+        </div>
+        <div class="input-wrap form-full" style="margin-bottom:.75rem">
+          <label>Remarks / Notes <span style="color:var(--text3);font-size:11px">(optional)</span></label>
+          <input id="restock-remarks" placeholder="e.g. Q1 supply request approved by Admin Officer">
+        </div>
+        <div class="input-wrap form-full" style="margin-bottom:0">
+          <label>Attach File <span style="color:var(--text3);font-size:11px">(RIS scan, invoice, receipt — stored in browser)</span></label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <label id="restock-file-label" style="flex:1;background:var(--bg3);border:1px dashed var(--border2);border-radius:8px;padding:8px 12px;cursor:pointer;display:flex;align-items:center;gap:8px;color:var(--text2);font-size:13px;transition:border-color .15s" onmouseover="this.style.borderColor='#2dd4bf'" onmouseout="this.style.borderColor='rgba(255,255,255,0.12)'">
+              <i class="ti ti-upload" style="font-size:16px;color:#2dd4bf"></i>
+              <span id="restock-file-name">Click to choose a file…</span>
+              <input type="file" id="restock-file" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" style="display:none" onchange="onRestockFileChange()">
+            </label>
+            <button class="btn btn-danger btn-sm" id="restock-file-clear" style="display:none" onclick="clearRestockFile()"><i class="ti ti-x"></i></button>
+          </div>
+          <div id="restock-file-preview" style="margin-top:6px;display:none"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-wrap"><label>Date Received</label><input id="restock-date" type="date"></div>
+    <p style="font-size:13px;font-weight:500;margin:.5rem 0">Items Received</p>
+    <div id="restock-items-wrap"></div>
+    <button class="btn btn-secondary" style="font-size:13px;margin-top:4px" onclick="addRestockRow()"><i class="ti ti-plus"></i> Add item</button>
+    <div class="total-preview" id="restock-total" style="display:none">Total Cost: <strong id="restock-total-val"></strong></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('restock')">Cancel</button>
+      <button class="btn btn-primary" id="restock-save-btn" onclick="saveRestock()">Save Record</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Issuance -->
+<div class="modal-backdrop" id="modal-iss">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title" id="iss-modal-title">New Issuance Request</h2>
+      <button class="modal-close" onclick="closeModal('iss')">×</button>
+    </div>
+    <div class="form-grid-2">
+      <div class="input-wrap"><label>Requested By</label><input id="iss-requester" placeholder="Full name"></div>
+      <div class="form-full input-wrap"><label>Date</label><input id="iss-date" type="date"></div>
+    </div>
+    <p style="font-size:13px;font-weight:500;margin:.25rem 0 .5rem">Items Requested</p>
+    <div id="iss-items-wrap"></div>
+    <button class="btn btn-secondary" style="font-size:13px;margin-top:4px" onclick="addIssRow()"><i class="ti ti-plus"></i> Add item</button>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('iss')">Cancel</button>
+      <button class="btn btn-primary" id="iss-save-btn" onclick="saveIssuance()">Issue Items</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Budget -->
+<div class="modal-backdrop" id="modal-budget">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 class="modal-title">Set Annual Budget</h2>
+      <button class="modal-close" onclick="closeModal('budget')">×</button>
+    </div>
+    <div class="input-wrap"><label>Total Allocated Budget (₱)</label><input id="budget-input" type="number" min="0"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('budget')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBudget()">Save Budget</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════
+//  CONSTANTS & DATA
+// ══════════════════════════════════════════════
+const KEYS  = { inv:'ost2_inventory', restock:'ost2_restocking', requests:'ost2_requests', budget:'ost2_budget', prices:'ost2_pricelist' };
+// units are derived dynamically from price list entries
+
+const DEF_INV = [];
+const DEF_PRICES = [];
+
+function load(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch{}}
+
+let inventory  = load(KEYS.inv,      DEF_INV);
+let restocking = load(KEYS.restock,  []);
+let requests   = load(KEYS.requests, []);
+let budget     = load(KEYS.budget,   {total:50000,used:0});
+let priceList  = load(KEYS.prices,   DEF_PRICES);
+
+function persist(){
+  save(KEYS.inv,inventory); save(KEYS.restock,restocking);
+  save(KEYS.requests,requests); save(KEYS.budget,budget); save(KEYS.prices,priceList);
+}
+
+// ── helpers ──
+function getPriceByInvId(invId)  {
+  // Try matching by linked invId first, then fall back to name-based match
+  const byId = priceList.find(p=>p.invId===invId);
+  if(byId) return byId;
+  const inv = inventory.find(i=>i.id===invId);
+  if(!inv) return null;
+  return priceList.find(p=>p.name===inv.name)||null;
+}
+function genReqId(){ if(!restocking.length) return 'REQ-001'; return `REQ-${String(Math.max(...restocking.map(r=>parseInt(r.id.replace('REQ-',''))))+1).padStart(3,'0')}`; }
+function genIssId(){ if(!requests.length)   return 'ISS-001'; return `ISS-${String(Math.max(...requests.map(r=>parseInt(r.id.replace('ISS-',''))))+1).padStart(3,'0')}`; }
+function genPlId() { if(!priceList.length)  return 201; return Math.max(...priceList.map(p=>p.id))+1; }
+function bdg(text,color){ return `<span class="badge badge-${color}">${text}</span>`; }
+function statusBadge(qty,min){ if(qty===0) return bdg('Out of stock','red'); if(qty<=min) return bdg('Low stock','amber'); return bdg('In stock','green'); }
+function ph(n){ return `₱${Number(n).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2})}`; }
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+function todayFmt(){ return new Date().toLocaleDateString('en-PH',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+
+// ══════════════════════════════════════════════
+//  NAV
+// ══════════════════════════════════════════════
+function switchTab(name,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+  ({dashboard:renderDashboard,inventory:renderInventoryTable,restock:renderRestockList,
+    issuance:renderIssuanceList,pricelist:renderPriceList,budget:renderBudgetTab,
+    reports:function(){},ris:risTabActivated}[name]||function(){})();
+}
+
+// ══════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════
+function renderDashboard(){
+  const rem=budget.total-budget.used, pct=budget.total>0?Math.round((budget.used/budget.total)*100):0;
+  const lowStock=inventory.filter(i=>i.quantity<=i.minStock);
+  const inStock=inventory.filter(i=>i.quantity>i.minStock).length;
+  const totalIssued=requests.reduce((s,r)=>s+r.items.reduce((a,x)=>a+x.qty,0),0);
+
+  document.getElementById('hero-date').textContent=todayFmt();
+  const ln=document.getElementById('hero-low-num');
+  ln.textContent=lowStock.length; ln.style.color=lowStock.length>0?'#FAC775':'#5DCAA5';
+  document.getElementById('hero-low-sub').textContent=lowStock.length===1?'item':'items';
+  document.getElementById('hero-budget-label').textContent=`Annual Budget · ₱${budget.total.toLocaleString()}`;
+  document.getElementById('hero-pct-label').textContent=`${pct}% used`;
+  document.getElementById('hero-pct-label').style.color=pct>90?'#FAC775':'rgba(255,255,255,0.6)';
+  const hb=document.getElementById('hero-bar');
+  hb.style.width=Math.min(pct,100)+'%'; hb.style.background=pct>90?'#FAC775':'#5DCAA5';
+  document.getElementById('hero-spent').textContent=`Spent: ₱${budget.used.toLocaleString()}`;
+  document.getElementById('hero-rem').textContent=`Remaining: ₱${rem.toLocaleString()}`;
+
+  document.getElementById('metric-grid').innerHTML=[
+    {label:'Total Items',    value:inventory.length, sub:`${inStock} in good stock`,         icon:'ti-package',         iC:'#60a5fa',iB:'rgba(59,130,246,.14)', vC:'#93c5fd'},
+    {label:'Total Expenses', value:ph(budget.used),  sub:'restocking costs',                  icon:'ti-receipt',         iC:'#c4b5fd',iB:'rgba(167,139,250,.14)',vC:'#ddd6fe'},
+    {label:'Remaining',      value:ph(rem),           sub:`${pct}% of budget used`,            icon:'ti-wallet',          iC:rem<0?'#f87171':'#4ade80',iB:rem<0?'rgba(239,68,68,.13)':'rgba(34,197,94,.12)',vC:rem<0?'#fca5a5':'#86efac'},
+    {label:'Items Issued',   value:totalIssued,       sub:`${requests.length} total requests`, icon:'ti-clipboard-check', iC:'#fbbf24',iB:'rgba(245,158,11,.12)', vC:'#fde68a'},
+  ].map(c=>`<div class="metric-card"><div class="metric-top"><div class="metric-label">${c.label}</div><div class="metric-icon" style="background:${c.iB}"><i class="ti ${c.icon}" style="color:${c.iC}"></i></div></div><div><div class="metric-value" style="color:${c.vC}">${c.value}</div><div class="metric-sub">${c.sub}</div></div></div>`).join('');
+
+  const lb=document.getElementById('low-badge'), lbody=document.getElementById('low-panel-body');
+  if(!lowStock.length){ lb.style.display='none'; lbody.innerHTML=`<div class="panel-empty"><i class="ti ti-circle-check" style="color:#22c55e"></i><p>All items well stocked</p></div>`; }
+  else{ lb.style.display='inline'; lb.textContent=lowStock.length; lbody.innerHTML=lowStock.map(i=>`<div class="panel-row"><div><div class="panel-row-name">${i.name}</div><div class="panel-row-sub">${i.quantity} ${i.unit} left</div></div>${statusBadge(i.quantity,i.minStock)}</div>`).join(''); }
+
+  const ibody=document.getElementById('iss-panel-body'), r5=requests.slice(0,5);
+  ibody.innerHTML=!r5.length?`<div class="panel-empty"><i class="ti ti-inbox"></i><p>No issuances yet</p></div>`:r5.map(r=>`<div class="iss-row"><div class="iss-top"><div style="display:flex;align-items:center;gap:8px">${bdg(r.id,'blue')}<span style="font-size:13px;font-weight:500">${r.requester}</span></div>${bdg(r.status,'green')}</div><div class="iss-meta">${r.items.map(i=>i.name).join(', ')} · ${r.date}</div></div>`).join('');
+
+  const rw=document.getElementById('restock-panel-wrap'), r5r=restocking.slice(0,5);
+  rw.innerHTML=!r5r.length?`<div class="empty-state" style="padding:2rem"><i class="ti ti-truck-off"></i><p>No restocking records yet</p></div>`:`<table><thead><tr><th>Request ID</th><th>Date Received</th><th>Items</th><th>Total Cost</th></tr></thead><tbody>${r5r.map((r,i)=>`<tr class="${i%2===1?'alt-row':''}"><td>${bdg(r.id,'purple')}</td><td class="muted">${r.date}</td><td>${r.items.map(x=>`${x.name} ×${x.qty}`).join(' · ')}</td><td style="font-weight:500">${ph(r.totalCost)}</td></tr>`).join('')}</tbody></table>`;
+}
+
+// ══════════════════════════════════════════════
+//  INVENTORY
+// ══════════════════════════════════════════════
+function renderInventoryTable(){
+  const search=(document.getElementById('inv-search')||{value:''}).value.toLowerCase();
+  const filtered=inventory.filter(i=>i.name.toLowerCase().includes(search));
+  document.getElementById('inv-tbody').innerHTML=!filtered.length
+    ?`<tr><td colspan="7" style="text-align:center;color:var(--text2);padding:2rem">No items found.</td></tr>`
+    :filtered.map(item=>{
+        const pl=getPriceByInvId(item.id);
+        return `<tr>
+          <td style="font-weight:500">${item.name}</td>
+          <td class="muted">${item.unit}</td>
+          <td style="font-weight:500">${item.quantity}</td>
+          <td class="muted">${item.minStock}</td>
+          <td>${pl?`<span style="color:#2dd4bf;font-weight:500">${ph(pl.price)}</span>`:`<span class="no-price"><i class="ti ti-alert-circle"></i> No price set</span>`}</td>
+          <td>${statusBadge(item.quantity,item.minStock)}</td>
+          <td><div style="display:flex;gap:6px">
+            <button class="btn btn-secondary btn-sm" onclick="openEditInv(${item.id})">Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteInv(${item.id})">Del</button>
+          </div></td>
+        </tr>`;
+      }).join('');
+}
+
+let editInvId=null;
+function openModal(type){
+  if(type==='inv'){
+    editInvId=null;
+    document.getElementById('inv-modal-title').textContent='Add Inventory Item';
+    document.getElementById('inv-save-btn').textContent='Add Item';
+    ['inv-qty','inv-min'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('inv-unit').value='';
+    // build dropdown from price list, excluding already-added inventory names
+    const usedNames=new Set(inventory.map(i=>i.name));
+    const available=priceList.filter(p=>!usedNames.has(p.name));
+    const sel=document.getElementById('inv-name');
+    sel.innerHTML=`<option value="">— Select item —</option>`
+      +available.map(p=>`<option value="${p.name}" data-unit="${p.unit}">${p.name}</option>`).join('');
+    sel.disabled=available.length===0;
+    if(available.length===0) sel.innerHTML=`<option value="">No price list items available</option>`;
+  }
+  if(type==='pl'){
+    editPlId=null;
+    document.getElementById('pl-modal-title').textContent='Add Item to Price List';
+    document.getElementById('pl-save-btn').textContent='Save Price';
+    document.getElementById('pl-price').value='';
+    document.getElementById('pl-item-name').value='';
+    document.getElementById('pl-item-name').disabled=false;
+    document.getElementById('pl-unit').value='';
+    document.getElementById('pl-unit').disabled=false;
+    // populate unit datalist from already-used units
+    const usedUnits=[...new Set(priceList.map(p=>p.unit).filter(Boolean))];
+    document.getElementById('pl-unit-list').innerHTML=usedUnits.map(u=>`<option value="${u}">`).join('');
+  }
+  if(type==='restock'){
+    editRestockId=null;
+    document.getElementById('restock-modal-title').textContent='New Restocking Record';
+    document.getElementById('restock-save-btn').textContent='Save Record';
+    document.getElementById('restock-date').value=todayISO();
+    document.getElementById('restock-ref-num').value='';
+    document.getElementById('restock-remarks').value='';
+    document.getElementById('restock-doc-type').value='RIS';
+    document.getElementById('restock-items-wrap').innerHTML='';
+    document.getElementById('restock-total').style.display='none';
+    clearRestockFile();
+    addRestockRow();
+  }
+  if(type==='iss'){
+    editIssId=null;
+    document.getElementById('iss-modal-title').textContent='New Issuance Request';
+    document.getElementById('iss-save-btn').textContent='Issue Items';
+    document.getElementById('iss-requester').value='';
+    document.getElementById('iss-date').value=todayISO();
+    document.getElementById('iss-items-wrap').innerHTML='';
+    addIssRow();
+  }
+  if(type==='budget') document.getElementById('budget-input').value=budget.total;
+  document.getElementById('modal-'+type).classList.add('open');
+}
+
+function closeModal(type){
+  document.getElementById('modal-'+type).classList.remove('open');
+  if(type==='pl'){ editPlId=null; }
+}
+
+function openEditInv(id){
+  const item=inventory.find(i=>i.id===id); if(!item) return;
+  editInvId=id;
+  document.getElementById('inv-modal-title').textContent='Edit Item';
+  document.getElementById('inv-save-btn').textContent='Save Changes';
+  document.getElementById('inv-qty').value=item.quantity;
+  document.getElementById('inv-min').value=item.minStock;
+  document.getElementById('inv-unit').value=item.unit;
+  // build dropdown: all price list items (other items may have been added since)
+  const usedNames=new Set(inventory.filter(i=>i.id!==id).map(i=>i.name));
+  const available=priceList.filter(p=>!usedNames.has(p.name));
+  const sel=document.getElementById('inv-name');
+  sel.disabled=false;
+  sel.innerHTML=`<option value="">— Select item —</option>`
+    +available.map(p=>`<option value="${p.name}" data-unit="${p.unit}" ${p.name===item.name?'selected':''}>${p.name}</option>`).join('');
+  // if current name not in price list, add it as an option
+  if(!available.find(p=>p.name===item.name)){
+    sel.innerHTML+=`<option value="${item.name}" data-unit="${item.unit}" selected>${item.name}</option>`;
+  }
+  document.getElementById('modal-inv').classList.add('open');
+}
+
+function saveInventory(){
+  const sel=document.getElementById('inv-name');
+  const name=sel.value.trim();
+  const qty=+document.getElementById('inv-qty').value;
+  if(!name){ alert('Please select an item.'); return; }
+  if(isNaN(qty)){ alert('Please enter a quantity.'); return; }
+  const unit=document.getElementById('inv-unit').value.trim();
+  const data={name,unit,quantity:qty,minStock:+document.getElementById('inv-min').value||0};
+  if(editInvId) inventory=inventory.map(i=>i.id===editInvId?{...i,...data}:i);
+  else inventory.push({id:Date.now(),...data});
+  persist(); closeModal('inv'); renderInventoryTable(); renderDashboard();
+}
+function deleteInv(id){
+  if(!confirm('Delete this item?')) return;
+  inventory=inventory.filter(i=>i.id!==id);
+  persist(); renderInventoryTable(); renderDashboard();
+}
+
+function onInvNameChange(){
+  const sel=document.getElementById('inv-name');
+  const opt=sel.selectedOptions[0];
+  const unit=opt?.dataset.unit||'';
+  document.getElementById('inv-unit').value=unit;
+}
+
+// ══════════════════════════════════════════════
+//  PRICE LIST
+// ══════════════════════════════════════════════
+document.getElementById('pl-current-year').textContent=new Date().getFullYear();
+let editPlId=null;
+
+
+
+function savePriceItem(){
+  const price=parseFloat(document.getElementById('pl-price').value);
+  if(!price||price<=0){ alert('Please enter a valid price.'); return; }
+  const unit=document.getElementById('pl-unit').value.trim();
+  if(!unit){ alert('Please enter a unit.'); return; }
+
+  if(editPlId!==null){
+    priceList=priceList.map(p=>p.id!==editPlId?p:{...p,price,unit,updatedDate:todayISO()});
+  } else {
+    const name=document.getElementById('pl-item-name').value.trim();
+    if(!name){ alert('Please enter an item name.'); return; }
+    priceList.push({id:genPlId(),invId:null,name,unit,price,updatedDate:todayISO()});
+  }
+  persist(); closeModal('pl'); renderPriceList(); renderInventoryTable();
+}
+
+function openEditPrice(id){
+  const pl=priceList.find(p=>p.id===id); if(!pl) return;
+  editPlId=id;
+  document.getElementById('pl-modal-title').textContent='Update Price — '+pl.name;
+  document.getElementById('pl-save-btn').textContent='Update Price';
+  document.getElementById('pl-item-name').value=pl.name;
+  document.getElementById('pl-item-name').disabled=true;
+  document.getElementById('pl-unit').value=pl.unit;
+  document.getElementById('pl-unit').disabled=false;
+  const usedUnits=[...new Set(priceList.map(p=>p.unit).filter(Boolean))];
+  document.getElementById('pl-unit-list').innerHTML=usedUnits.map(u=>`<option value="${u}">`).join('');
+  document.getElementById('pl-price').value=pl.price;
+  document.getElementById('modal-pl').classList.add('open');
+}
+
+function deletePriceItem(id){
+  if(!confirm('Remove this item from the price list?')) return;
+  priceList=priceList.filter(p=>p.id!==id);
+  persist(); renderPriceList(); renderInventoryTable();
+}
+
+function renderPriceList(){
+  const search=(document.getElementById('pl-search')||{value:''}).value.toLowerCase();
+  const filtered=priceList.filter(p=>p.name.toLowerCase().includes(search));
+  document.getElementById('pl-tbody').innerHTML=!filtered.length
+    ?`<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:2rem">No price entries yet. Add one above.</td></tr>`
+    :filtered.map(p=>`
+      <tr>
+        <td style="font-weight:500">${p.name}</td>
+        <td class="muted">${p.unit}</td>
+        <td style="color:#2dd4bf;font-weight:500;font-size:14px">${ph(p.price)}</td>
+        <td class="muted">${p.updatedDate}</td>
+        <td><div style="display:flex;gap:6px">
+          <button class="btn btn-teal btn-sm" onclick="openEditPrice(${p.id})">Edit Price</button>
+          <button class="btn btn-danger btn-sm" onclick="deletePriceItem(${p.id})">Del</button>
+        </div></td>
+      </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════
+//  RESTOCK
+// ══════════════════════════════════════════════
+function addRestockRow(){
+  const wrap=document.getElementById('restock-items-wrap');
+  const idx=wrap.children.length;
+  const div=document.createElement('div');
+  div.className='item-row item-row-3'; div.id=`rrow-${idx}`;
+  const opts=priceList.length
+    ? priceList.map(p=>`<option value="${p.id}" data-cost="${p.price}" data-inv="${p.invId||''}">${p.name} — ${ph(p.price)} / ${p.unit}</option>`).join('')
+    : '';
+  div.innerHTML=`
+    <select id="rsel-${idx}" onchange="updateRestockTotal()">
+      <option value="">— Select item from Price List —</option>${opts}
+    </select>
+    <input type="number" placeholder="Qty" min="1" id="rqty-${idx}" oninput="updateRestockTotal()">
+    <button class="btn btn-danger" onclick="removeRow('rrow-${idx}');updateRestockTotal()">×</button>`;
+  if(!opts) div.querySelector('select').insertAdjacentHTML('afterend','<small style="color:#fbbf24;font-size:11px;grid-column:1/-1">⚠ No items in Price List yet — add prices first.</small>');
+  wrap.appendChild(div);
+}
+
+function updateRestockTotal(){
+  const rows=document.getElementById('restock-items-wrap').children;
+  let total=0, has=false;
+  for(const row of rows){
+    const i=row.id.replace('rrow-','');
+    const sel=document.getElementById(`rsel-${i}`);
+    const qty=+(document.getElementById(`rqty-${i}`)||{value:0}).value||0;
+    if(!sel||!sel.value||qty<=0) continue;
+    const cost=+sel.selectedOptions[0]?.dataset.cost||0;
+    total+=qty*cost; has=true;
+  }
+  const el=document.getElementById('restock-total');
+  if(has){el.style.display='block';document.getElementById('restock-total-val').textContent=ph(total);}
+  else el.style.display='none';
+}
+
+function removeRow(id){ const el=document.getElementById(id); if(el) el.remove(); }
+
+let editRestockId=null;
+
+function saveRestock(){
+  const rows=document.getElementById('restock-items-wrap').children;
+  const items=[];
+  for(const row of rows){
+    const idx=row.id.replace('rrow-','');
+    const sel=document.getElementById(`rsel-${idx}`);
+    const qty=+document.getElementById(`rqty-${idx}`).value;
+    if(!sel.value||qty<=0) continue;
+    const plId=+sel.value;
+    const pl=priceList.find(p=>p.id===plId); if(!pl) continue;
+    const invId=pl.invId||null;
+    items.push({plId,invId,name:pl.name,qty,unitCost:pl.price,total:qty*pl.price});
+  }
+  if(!items.length) return;
+  const date=document.getElementById('restock-date').value;
+  const docType=document.getElementById('restock-doc-type').value;
+  const refNum=document.getElementById('restock-ref-num').value.trim();
+  const remarks=document.getElementById('restock-remarks').value.trim();
+  const fileData=window._restockFileData!==undefined?window._restockFileData:null;
+  const fileName=window._restockFileName||null;
+  const fileType=window._restockFileType||null;
+
+  if(editRestockId){
+    // Edit: reverse old stock/budget, apply new
+    const old=restocking.find(r=>r.id===editRestockId);
+    if(old){
+      inventory=inventory.map(inv=>{const ri=old.items.find(r=>r.invId===inv.id||r.name===inv.name);return ri?{...inv,quantity:inv.quantity-ri.qty}:inv;});
+      budget.used-=old.totalCost;
+    }
+    const totalCost=items.reduce((s,i)=>s+i.total,0);
+    const keepFile=window._restockFileData===undefined;
+    restocking=restocking.map(r=>r.id===editRestockId?{...r,date,items,totalCost,docType,refNum,remarks,
+      fileData:keepFile?(old?old.fileData:null):fileData,
+      fileName:keepFile?(old?old.fileName:null):fileName,
+      fileType:keepFile?(old?old.fileType:null):fileType}:r);
+    inventory=inventory.map(inv=>{const ri=items.find(r=>r.invId===inv.id||r.name===inv.name);return ri?{...inv,quantity:inv.quantity+ri.qty}:inv;});
+    budget.used+=totalCost;
+  } else {
+    const id=genReqId(), totalCost=items.reduce((s,i)=>s+i.total,0);
+    restocking.unshift({id,date,items,totalCost,docType,refNum,remarks,fileData,fileName,fileType});
+    inventory=inventory.map(inv=>{const ri=items.find(r=>r.invId===inv.id||r.name===inv.name);return ri?{...inv,quantity:inv.quantity+ri.qty}:inv;});
+    budget.used+=totalCost;
+  }
+  window._restockFileData=undefined; window._restockFileName=null; window._restockFileType=null;
+  editRestockId=null;
+  persist(); closeModal('restock'); renderRestockList(); renderDashboard();
+}
+
+function openEditRestock(id){
+  const r=restocking.find(x=>x.id===id); if(!r) return;
+  editRestockId=id;
+  document.getElementById('restock-modal-title').textContent='Edit Restocking Record — '+id;
+  document.getElementById('restock-save-btn').textContent='Update Record';
+  document.getElementById('restock-date').value=r.date||todayISO();
+  document.getElementById('restock-doc-type').value=r.docType||'RIS';
+  document.getElementById('restock-ref-num').value=r.refNum||'';
+  document.getElementById('restock-remarks').value=r.remarks||'';
+  document.getElementById('restock-items-wrap').innerHTML='';
+  document.getElementById('restock-total').style.display='none';
+  // pre-fill items
+  r.items.forEach(item=>{
+    addRestockRow();
+    const idx=document.getElementById('restock-items-wrap').children.length-1;
+    const sel=document.getElementById(`rsel-${idx}`);
+    // find matching price list entry
+    const pl=priceList.find(p=>p.id===item.plId)||(item.invId?priceList.find(p=>p.invId===item.invId):null);
+    if(pl) sel.value=pl.id;
+    document.getElementById(`rqty-${idx}`).value=item.qty;
+  });
+  updateRestockTotal();
+  // keep existing file reference unchanged (undefined signals "keep old")
+  window._restockFileData=undefined;
+  window._restockFileName=r.fileName||null;
+  window._restockFileType=r.fileType||null;
+  // show existing file in preview area
+  const prev=document.getElementById('restock-file-preview');
+  const nameLbl=document.getElementById('restock-file-name');
+  const clearBtn=document.getElementById('restock-file-clear');
+  if(r.fileName){
+    nameLbl.textContent=r.fileName;
+    clearBtn.style.display='inline-flex';
+    prev.style.display='block';
+    if(r.fileType&&r.fileType.startsWith('image/')){
+      prev.innerHTML=`<img src="${r.fileData}" style="max-width:100%;max-height:140px;border-radius:6px;border:1px solid var(--border2)">`;
+    } else {
+      prev.innerHTML=`<div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px"><i class="ti ti-file" style="color:#2dd4bf"></i>${r.fileName}</div>`;
+    }
+  } else {
+    clearRestockFile();
+  }
+  document.getElementById('modal-restock').classList.add('open');
+}
+
+function deleteRestock(id){
+  if(!confirm('Delete this restocking record? Stock quantities and budget will be reversed.')) return;
+  const r=restocking.find(x=>x.id===id); if(!r) return;
+  inventory=inventory.map(inv=>{const ri=r.items.find(x=>x.invId===inv.id||x.name===inv.name);return ri?{...inv,quantity:Math.max(0,inv.quantity-ri.qty)}:inv;});
+  budget.used=Math.max(0,budget.used-r.totalCost);
+  restocking=restocking.filter(x=>x.id!==id);
+  persist(); renderRestockList(); renderDashboard();
+}
+
+function onRestockFileChange(){
+  const file=document.getElementById('restock-file').files[0]; if(!file) return;
+  const maxMB=4;
+  if(file.size > maxMB*1024*1024){ alert(`File too large. Max ${maxMB} MB.`); return; }
+  document.getElementById('restock-file-name').textContent=file.name;
+  document.getElementById('restock-file-clear').style.display='inline-flex';
+  const reader=new FileReader();
+  reader.onload=function(e){
+    window._restockFileData=e.target.result;
+    window._restockFileName=file.name;
+    window._restockFileType=file.type;
+    // image preview
+    const prev=document.getElementById('restock-file-preview');
+    if(file.type.startsWith('image/')){
+      prev.style.display='block';
+      prev.innerHTML=`<img src="${e.target.result}" style="max-width:100%;max-height:140px;border-radius:6px;border:1px solid var(--border2)">`;
+    } else {
+      prev.style.display='block';
+      prev.innerHTML=`<div style="font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px"><i class="ti ti-file" style="color:#2dd4bf"></i>${file.name} (${(file.size/1024).toFixed(1)} KB)</div>`;
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearRestockFile(){
+  window._restockFileData=null; window._restockFileName=null; window._restockFileType=null;
+  document.getElementById('restock-file').value='';
+  document.getElementById('restock-file-name').textContent='Click to choose a file…';
+  document.getElementById('restock-file-clear').style.display='none';
+  document.getElementById('restock-file-preview').style.display='none';
+  document.getElementById('restock-file-preview').innerHTML='';
+}
+
+function renderRestockList(){
+  const el=document.getElementById('restock-list');
+  if(!restocking.length){ el.innerHTML=`<div class="empty-state"><i class="ti ti-truck-delivery"></i><p>No restocking records yet.</p></div>`; return; }
+  el.innerHTML=restocking.map(r=>{
+    const refBlock = (r.refNum||r.remarks||r.fileName) ? `
+      <div style="background:rgba(20,184,166,.07);border:1px solid rgba(20,184,166,.18);border-radius:8px;padding:8px 12px;margin-bottom:10px;display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        ${r.docType||r.refNum ? `<div style="display:flex;align-items:center;gap:6px"><i class="ti ti-file-description" style="font-size:14px;color:#2dd4bf"></i><span style="font-size:12px;font-weight:600;color:#2dd4bf">${r.docType||''}</span>${r.refNum?`<span style="font-size:12px;color:var(--text)">${r.refNum}</span>`:''}` + `</div>` : ''}
+        ${r.remarks ? `<div style="font-size:12px;color:var(--text2);flex:1"><i class="ti ti-notes" style="font-size:13px;margin-right:4px"></i>${r.remarks}</div>` : ''}
+        ${r.fileName ? `<button class="btn btn-teal btn-sm" onclick="viewAttachment('${r.id}')" style="padding:3px 10px;font-size:12px"><i class="ti ti-paperclip"></i> ${r.fileName}</button>` : ''}
+      </div>` : '';
+    return `
+      <div class="record-card">
+        <div class="record-head">
+          <div class="record-head-left">${bdg(r.id,'purple')}<span style="font-size:13px;color:var(--text2)">${r.date}</span></div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:14px;font-weight:500;color:#93c5fd">Total: ${ph(r.totalCost)}</span>
+            <button class="btn btn-secondary btn-sm" onclick="openEditRestock('${r.id}')"><i class="ti ti-edit"></i> Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteRestock('${r.id}')"><i class="ti ti-trash"></i> Delete</button>
+          </div>
+        </div>
+        ${refBlock}
+        <table><thead><tr><th>Item</th><th>Qty</th><th>Unit Cost</th><th>Subtotal</th></tr></thead>
+        <tbody>${r.items.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td><td>${ph(i.unitCost)}</td><td style="font-weight:500">${ph(i.total)}</td></tr>`).join('')}</tbody></table>
+      </div>`;
+  }).join('');
+}
+
+function viewAttachment(restockId){
+  const r=restocking.find(x=>x.id===restockId); if(!r||!r.fileData) return;
+  const win=window.open('','_blank');
+  if(r.fileType&&r.fileType.startsWith('image/')){
+    win.document.write(`<html><body style="margin:0;background:#111;display:flex;justify-content:center;align-items:center;min-height:100vh"><img src="${r.fileData}" style="max-width:100%;max-height:100vh;object-fit:contain"></body></html>`);
+  } else {
+    const a=win.document.createElement('a');
+    a.href=r.fileData; a.download=r.fileName; a.click();
+    win.close();
+  }
+}
+
+// ══════════════════════════════════════════════
+//  ISSUANCE
+// ══════════════════════════════════════════════
+function addIssRow(){
+  const wrap=document.getElementById('iss-items-wrap');
+  const idx=wrap.children.length;
+  const div=document.createElement('div');
+  div.className='item-row item-row-3'; div.id=`irow-${idx}`;
+  div.innerHTML=`
+    <select id="isel-${idx}">
+      <option value="">Select item</option>
+      ${inventory.filter(i=>i.quantity>0).map(i=>`<option value="${i.id}">${i.name} (stock: ${i.quantity})</option>`).join('')}
+    </select>
+    <input type="number" placeholder="Qty" min="1" id="iqty-${idx}">
+    <button class="btn btn-danger" onclick="removeRow('irow-${idx}')">×</button>`;
+  wrap.appendChild(div);
+}
+
+let editIssId=null;
+
+function saveIssuance(){
+  const requester=document.getElementById('iss-requester').value.trim();
+  if(!requester){ alert('Please enter a requester name.'); return; }
+  const rows=document.getElementById('iss-items-wrap').children;
+  const items=[];
+  for(const row of rows){
+    const idx=row.id.replace('irow-','');
+    const invId=+document.getElementById(`isel-${idx}`).value;
+    const qty=+document.getElementById(`iqty-${idx}`).value;
+    if(!invId||qty<=0) continue;
+    const inv=inventory.find(i=>i.id===invId);
+    // when editing, add back old qty first for stock check
+    const oldQty=editIssId?(requests.find(r=>r.id===editIssId)?.items.find(x=>x.itemId===invId)?.qty||0):0;
+    if(!inv||(inv.quantity+oldQty)<qty){ alert(`Insufficient stock for ${inv?inv.name:'item'}.`); return; }
+    items.push({itemId:invId,name:inv.name,qty});
+  }
+  if(!items.length) return;
+  const date=document.getElementById('iss-date').value;
+
+  if(editIssId){
+    const old=requests.find(r=>r.id===editIssId);
+    if(old){
+      // restore old stock
+      inventory=inventory.map(inv=>{const ri=old.items.find(x=>x.itemId===inv.id);return ri?{...inv,quantity:inv.quantity+ri.qty}:inv;});
+    }
+    requests=requests.map(r=>r.id===editIssId?{...r,date,requester,items,status:'Released'}:r);
+    inventory=inventory.map(inv=>{const ri=items.find(x=>x.itemId===inv.id);return ri?{...inv,quantity:inv.quantity-ri.qty}:inv;});
+  } else {
+    const id=genIssId();
+    requests.unshift({id,date,requester,items,status:'Released'});
+    inventory=inventory.map(inv=>{const ri=items.find(x=>x.itemId===inv.id);return ri?{...inv,quantity:inv.quantity-ri.qty}:inv;});
+  }
+  editIssId=null;
+  persist(); closeModal('iss'); renderIssuanceList(); renderDashboard();
+}
+
+function openEditIss(id){
+  const r=requests.find(x=>x.id===id); if(!r) return;
+  editIssId=id;
+  document.getElementById('iss-modal-title').textContent='Edit Issuance — '+id;
+  document.getElementById('iss-save-btn').textContent='Update Record';
+  document.getElementById('iss-requester').value=r.requester||'';
+  document.getElementById('iss-date').value=r.date||todayISO();
+  document.getElementById('iss-items-wrap').innerHTML='';
+  // restore old stock temporarily so addIssRow shows correct stock
+  const tempInv=inventory.map(inv=>{const ri=r.items.find(x=>x.itemId===inv.id);return ri?{...inv,quantity:inv.quantity+ri.qty}:inv;});
+  const _inv=inventory; inventory=tempInv;
+  r.items.forEach(item=>{
+    addIssRow();
+    const idx=document.getElementById('iss-items-wrap').children.length-1;
+    document.getElementById(`isel-${idx}`).value=item.itemId;
+    document.getElementById(`iqty-${idx}`).value=item.qty;
+  });
+  inventory=_inv;
+  document.getElementById('modal-iss').classList.add('open');
+}
+
+function deleteIss(id){
+  if(!confirm('Delete this issuance record? Stock quantities will be restored.')) return;
+  const r=requests.find(x=>x.id===id); if(!r) return;
+  inventory=inventory.map(inv=>{const ri=r.items.find(x=>x.itemId===inv.id);return ri?{...inv,quantity:inv.quantity+ri.qty}:inv;});
+  requests=requests.filter(x=>x.id!==id);
+  persist(); renderIssuanceList(); renderDashboard();
+}
+
+function renderIssuanceList(){
+  const el=document.getElementById('iss-list');
+  el.innerHTML=!requests.length
+    ?`<div class="empty-state"><i class="ti ti-clipboard-list"></i><p>No issuance records yet.</p></div>`
+    :requests.map(r=>`
+      <div class="record-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;gap:10px">
+          <div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">${bdg(r.id,'blue')} ${bdg(r.status,'green')}</div>
+            <div style="font-size:14px;font-weight:500">${r.requester}</div>
+            <div style="font-size:12px;color:var(--text2)">${r.date}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button class="btn btn-secondary btn-sm" onclick="openEditIss('${r.id}')"><i class="ti ti-edit"></i> Edit</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteIss('${r.id}')"><i class="ti ti-trash"></i> Delete</button>
+          </div>
+        </div>
+        <table><thead><tr><th>Item</th><th>Qty Issued</th></tr></thead>
+        <tbody>${r.items.map(i=>`<tr><td>${i.name}</td><td>${i.qty}</td></tr>`).join('')}</tbody></table>
+      </div>`).join('');
+}
+
+// ══════════════════════════════════════════════
+//  BUDGET
+// ══════════════════════════════════════════════
+function saveBudget(){
+  budget.total=+document.getElementById('budget-input').value||0;
+  persist(); closeModal('budget'); renderBudgetTab(); renderDashboard();
+}
+
+function renderBudgetTab(){
+  const rem=budget.total-budget.used, pct=budget.total>0?Math.round((budget.used/budget.total)*100):0;
+  document.getElementById('budget-metric-grid').innerHTML=[
+    {label:'Annual Budget',value:ph(budget.total),color:'#93c5fd'},
+    {label:'Total Spent',  value:ph(budget.used), color:'#c4b5fd'},
+    {label:'Remaining',    value:ph(rem),color:rem>=0?'#86efac':'#fca5a5',sub:rem<0?'Over budget!':''},
+  ].map(c=>`<div class="metric-card"><div class="metric-label" style="margin-bottom:8px">${c.label}</div><div class="metric-value" style="color:${c.color}">${c.value}</div>${c.sub?`<div class="metric-sub" style="color:#f87171">${c.sub}</div>`:''}</div>`).join('');
+  document.getElementById('budget-pct-label').textContent=pct+'%';
+  document.getElementById('budget-pct-label').style.color=pct>90?'#f87171':'var(--text2)';
+  const bar=document.getElementById('budget-bar');
+  bar.style.width=Math.min(pct,100)+'%'; bar.style.background=pct>90?'#ef4444':pct>70?'#f59e0b':'#22c55e';
+  document.getElementById('budget-tbody').innerHTML=!restocking.length
+    ?`<tr><td colspan="4" style="text-align:center;color:var(--text2);padding:2rem">No expenses recorded.</td></tr>`
+    :restocking.map(r=>`<tr><td>${bdg(r.id,'purple')}</td><td class="muted">${r.date}</td><td class="muted">${r.items.map(i=>i.name).join(', ')}</td><td style="font-weight:500">${ph(r.totalCost)}</td></tr>`).join('');
+}
+
+// ══════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════
+(function(){
+  renderDashboard();
+  renderInventoryTable();
+})();
+
+document.querySelectorAll('.modal-backdrop').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m){ closeModal(m.id.replace('modal-','')); } });
+});
+
+
+// ══════════════════════════════════════════════
+//  REPORTS
+// ══════════════════════════════════════════════
+let currentReport = 'inventory';
+
+// switchTab already handles 'reports' via the object lookup — add it
+const _origSwitch = window.switchTab;
+
+function showReport(type) {
+  currentReport = type;
+  const frame = document.getElementById('rpt-preview-frame');
+  frame.innerHTML = buildReportHTML(type);
+  document.getElementById('rpt-preview-wrap').style.display = 'block';
+  document.getElementById('rpt-preview-wrap').scrollIntoView({ behavior: 'smooth' });
+}
+
+function printReport(type) {
+  currentReport = type;
+  const html = buildReportHTML(type);
+  const win = window.open('', '_blank', 'width=900,height=700');
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => { win.print(); }, 400);
+}
+
+function rptHeader(title, subtitle) {
+  const now = new Date().toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+  return `
+    <div style="border-bottom:2px solid #1a365d;padding-bottom:16px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:flex-end">
+      <div>
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#4a5568;margin-bottom:4px">Office Supplies Management System</div>
+        <div style="font-size:22px;font-weight:700;color:#1a202c">${title}</div>
+        <div style="font-size:13px;color:#718096;margin-top:2px">${subtitle}</div>
+      </div>
+      <div style="text-align:right;font-size:12px;color:#718096">
+        <div style="font-weight:600;color:#2d3748">Date Printed</div>
+        <div>${now}</div>
+      </div>
+    </div>`;
+}
+
+function rptStyles() {
+  return `<style>
+    @import url('https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.31.0/webfont/tabler-icons.min.css');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #1a202c; background: #fff; padding: 32px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; font-size: 12.5px; }
+    thead tr { background: #1a365d; color: #fff; }
+    th { padding: 9px 12px; text-align: left; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; }
+    td { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; color: #2d3748; vertical-align: top; }
+    tr:nth-child(even) td { background: #f7fafc; }
+    .status-ok   { background: #c6f6d5; color: #276749; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .status-low  { background: #fefcbf; color: #744210; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .status-out  { background: #fed7d7; color: #9b2c2c; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .id-pill { background: #ebf4ff; color: #2b6cb0; padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 700; }
+    .section-title { font-size: 14px; font-weight: 700; color: #1a365d; margin: 20px 0 8px; padding-bottom: 4px; border-bottom: 1px solid #bee3f8; }
+    .summary-row { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+    .summary-box { background: #ebf8ff; border: 1px solid #bee3f8; border-radius: 8px; padding: 12px 18px; min-width: 130px; }
+    .summary-box .s-label { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: #2c5282; margin-bottom: 3px; font-weight: 600; }
+    .summary-box .s-val   { font-size: 18px; font-weight: 700; color: #1a365d; }
+    .record-block { border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 16px; overflow: hidden; page-break-inside: avoid; }
+    .record-block-head { background: #f0f4ff; padding: 8px 14px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+    .record-block-head .rid { font-weight: 700; font-size: 12px; color: #2b6cb0; }
+    .record-block-head .rdate { font-size: 12px; color: #718096; }
+    .record-block-head .rtotal { font-weight: 700; font-size: 13px; color: #276749; }
+    .record-block table { margin-bottom: 0; }
+    .record-block thead tr { background: #dbeafe; }
+    .record-block th { color: #1e40af; }
+    .footer { margin-top: 32px; padding-top: 12px; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; font-size: 11px; color: #a0aec0; }
+    @media print {
+      body { padding: 20px; }
+      @page { margin: 1.5cm; size: A4; }
+      .no-print { display: none; }
+    }
+  </style>`;
+}
+
+function buildReportHTML(type) {
+  const now = new Date();
+  const footer = `<div class="footer"><span>Office Supplies Management System</span><span>Generated: ${now.toLocaleString('en-PH')}</span></div>`;
+
+  if (type === 'inventory') {
+    const sorted = [...inventory].sort((a,b) => a.name.localeCompare(b.name));
+    const lowCount = sorted.filter(i => i.quantity <= i.minStock && i.quantity > 0).length;
+    const outCount = sorted.filter(i => i.quantity === 0).length;
+    const okCount  = sorted.filter(i => i.quantity > i.minStock).length;
+
+    const rows = sorted.map(item => {
+      const pl = getPriceByInvId(item.id);
+      const price = pl ? `₱${pl.price.toLocaleString('en-PH',{minimumFractionDigits:2})}` : '—';
+      let status;
+      if (item.quantity === 0) status = '<span class="status-out">Out of Stock</span>';
+      else if (item.quantity <= item.minStock) status = '<span class="status-low">Low Stock</span>';
+      else status = '<span class="status-ok">In Stock</span>';
+      return `<tr>
+        <td style="font-weight:600">${item.name}</td>
+        <td style="text-align:center">${item.unit}</td>
+        <td style="text-align:center;font-weight:700">${item.quantity}</td>
+        <td style="text-align:center;color:#718096">${item.minStock}</td>
+        <td style="text-align:right">${price}</td>
+        <td>${status}</td>
+      </tr>`;
+    }).join('');
+
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Inventory Report</title>${rptStyles()}</head><body>
+      ${rptHeader('Inventory Report', 'Current stock levels of all office supplies')}
+      <div class="summary-row">
+        <div class="summary-box"><div class="s-label">Total Items</div><div class="s-val">${inventory.length}</div></div>
+        <div class="summary-box"><div class="s-label">In Stock</div><div class="s-val" style="color:#276749">${okCount}</div></div>
+        <div class="summary-box" style="background:#fffff0;border-color:#f6e05e"><div class="s-label" style="color:#744210">Low Stock</div><div class="s-val" style="color:#744210">${lowCount}</div></div>
+        <div class="summary-box" style="background:#fff5f5;border-color:#fed7d7"><div class="s-label" style="color:#9b2c2c">Out of Stock</div><div class="s-val" style="color:#9b2c2c">${outCount}</div></div>
+      </div>
+      <table>
+        <thead><tr><th>Item Name</th><th style="text-align:center">Unit</th><th style="text-align:center">Qty</th><th style="text-align:center">Min Stock</th><th style="text-align:right">Unit Price</th><th>Status</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="6" style="text-align:center;color:#a0aec0;padding:2rem">No inventory items.</td></tr>'}</tbody>
+      </table>
+      ${footer}</body></html>`;
+  }
+
+  if (type === 'restock') {
+    const grandTotal = restocking.reduce((s,r) => s + r.totalCost, 0);
+    const totalItems = restocking.reduce((s,r) => s + r.items.reduce((a,i) => a + i.qty, 0), 0);
+
+    const blocks = restocking.map(r => `
+      <div class="record-block">
+        <div class="record-block-head">
+          <div><span class="rid">${r.id}</span> &nbsp;<span class="rdate">${r.date}</span></div>
+          <div class="rtotal">Total: ₱${r.totalCost.toLocaleString('en-PH',{minimumFractionDigits:2})}</div>
+        </div>
+        <table>
+          <thead><tr><th>Item</th><th style="text-align:center">Qty</th><th style="text-align:right">Unit Cost</th><th style="text-align:right">Subtotal</th></tr></thead>
+          <tbody>${r.items.map(i=>`<tr>
+            <td>${i.name}</td>
+            <td style="text-align:center">${i.qty}</td>
+            <td style="text-align:right">₱${i.unitCost.toLocaleString('en-PH',{minimumFractionDigits:2})}</td>
+            <td style="text-align:right;font-weight:700">₱${i.total.toLocaleString('en-PH',{minimumFractionDigits:2})}</td>
+          </tr>`).join('')}</tbody>
+        </table>
+      </div>`).join('') || '<p style="color:#a0aec0;text-align:center;padding:2rem">No restocking records.</p>';
+
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Restocking Report</title>${rptStyles()}</head><body>
+      ${rptHeader('Restocking Report', 'All restocking records with itemized costs')}
+      <div class="summary-row">
+        <div class="summary-box"><div class="s-label">Total Records</div><div class="s-val">${restocking.length}</div></div>
+        <div class="summary-box"><div class="s-label">Total Items Received</div><div class="s-val">${totalItems}</div></div>
+        <div class="summary-box" style="background:#f0fff4;border-color:#9ae6b4"><div class="s-label" style="color:#276749">Grand Total Cost</div><div class="s-val" style="color:#276749">₱${grandTotal.toLocaleString('en-PH',{minimumFractionDigits:2})}</div></div>
+        <div class="summary-box" style="background:#ebf8ff;border-color:#bee3f8"><div class="s-label" style="color:#2c5282">Annual Budget</div><div class="s-val" style="color:#1a365d">₱${budget.total.toLocaleString()}</div></div>
+      </div>
+      ${blocks}
+      <div style="text-align:right;font-size:14px;font-weight:700;color:#1a365d;margin-top:8px;border-top:2px solid #1a365d;padding-top:12px">
+        Grand Total Restocking Cost: &nbsp; ₱${grandTotal.toLocaleString('en-PH',{minimumFractionDigits:2})}
+      </div>
+      ${footer}</body></html>`;
+  }
+
+  if (type === 'issuance') {
+    const totalQty = requests.reduce((s,r) => s + r.items.reduce((a,i) => a + i.qty, 0), 0);
+
+    const blocks = requests.map(r => `
+      <div class="record-block">
+        <div class="record-block-head">
+          <div>
+            <span class="rid">${r.id}</span> &nbsp;
+            <span style="font-weight:600;font-size:13px">${r.requester}</span>
+            ${r.department ? `<span style="color:#718096;font-size:12px"> · ${r.department}</span>` : ''}
+          </div>
+          <div class="rdate">${r.date}</div>
+        </div>
+        <table>
+          <thead><tr><th>Item</th><th style="text-align:center">Qty Issued</th></tr></thead>
+          <tbody>${r.items.map(i=>`<tr><td>${i.name}</td><td style="text-align:center;font-weight:700">${i.qty}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>`).join('') || '<p style="color:#a0aec0;text-align:center;padding:2rem">No issuance records.</p>';
+
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Issuance Report</title>${rptStyles()}</head><body>
+      ${rptHeader('Issuance Report', 'All supply issuances released to officemates')}
+      <div class="summary-row">
+        <div class="summary-box"><div class="s-label">Total Requests</div><div class="s-val">${requests.length}</div></div>
+        <div class="summary-box"><div class="s-label">Total Items Issued</div><div class="s-val">${totalQty}</div></div>
+      </div>
+      ${blocks}
+      ${footer}</body></html>`;
+  }
+  return '';
+}
+
+// ══════════════════════════════════════════════
+//  RIS GENERATOR
+// ══════════════════════════════════════════════
+let risRowCount = 0;
+
+function risTabActivated(){
+  const tbody = document.getElementById('ris-items-tbody');
+  if(!tbody) return;
+  if(tbody.children.length === 0){
+    document.getElementById('ris-req-date').value = todayISO();
+    for(let i=0;i<5;i++) risAddRow();
+  } else {
+    tbody.querySelectorAll('select.ris-desc-sel').forEach(sel => {
+      const cur = sel.value;
+      sel.innerHTML = risBuildOpts();
+      sel.value = cur;
+      const id = sel.id.replace('ris-desc-','');
+      risOnDescChange(id);
+    });
+  }
+}
+
+function risBuildOpts(){
+  if(!priceList.length) return '<option value="">— No items in Price List yet —</option>';
+  return '<option value="">— Select item —</option>'
+    + priceList.map(p=>`<option value="${p.id}" data-unit="${p.unit}">${p.name}</option>`).join('');
+}
+
+function risAddRow(plId='', qty=''){
+  risRowCount++;
+  const id = risRowCount;
+  const tbody = document.getElementById('ris-items-tbody');
+  const tr = document.createElement('tr');
+  tr.id = `ris-row-${id}`;
+  const selOpts = risBuildOpts();
+  tr.innerHTML = `
+    <td><input type="text" placeholder="e.g. 7510-01" style="font-size:13px;padding:6px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);width:100%;outline:none" /></td>
+    <td><input type="text" id="ris-unit-${id}" readonly placeholder="—" style="font-size:13px;padding:6px 9px;background:rgba(255,255,255,.03);border:1px solid var(--border2);border-radius:6px;color:var(--text2);width:100%;outline:none;cursor:default" /></td>
+    <td>
+      <select class="ris-desc-sel" id="ris-desc-${id}" onchange="risOnDescChange(${id})" style="font-size:13px;padding:6px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);width:100%;outline:none">
+        ${selOpts}
+      </select>
+    </td>
+    <td><input type="number" min="1" placeholder="0" style="text-align:center;font-size:13px;padding:6px 9px;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);width:100%;outline:none" /></td>
+    <td style="text-align:center">
+      <button class="btn btn-danger btn-sm" onclick="document.getElementById('ris-row-${id}').remove()" title="Remove"><i class="ti ti-trash" style="font-size:13px"></i></button>
+    </td>`;
+  tbody.appendChild(tr);
+  if(plId){
+    const sel = document.getElementById(`ris-desc-${id}`);
+    sel.value = plId;
+    risOnDescChange(id);
+  }
+}
+
+function risOnDescChange(id){
+  const sel = document.getElementById(`ris-desc-${id}`);
+  const opt = sel ? sel.selectedOptions[0] : null;
+  const unit = opt?.dataset.unit || '';
+  const unitEl = document.getElementById(`ris-unit-${id}`);
+  if(unitEl) unitEl.value = unit;
+}
+
+function risCollect(){
+  const fmtDate = v => {
+    if(!v) return '';
+    const [y,m,d] = v.split('-');
+    return `${d}/${m}/${y}`;
+  };
+  const items = [];
+  document.querySelectorAll('#ris-items-tbody tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    const sel    = tr.querySelector('select');
+    const stockNo = inputs[0]?.value.trim() || '';
+    const unit    = inputs[1]?.value.trim() || '';
+    const opt     = sel?.selectedOptions[0];
+    const desc    = (opt && opt.value) ? opt.textContent.trim() : '';
+    const qty     = inputs[2]?.value.trim() || '';
+    if(desc) items.push({stockNo, unit, desc, qty});
+  });
+  return {
+    entity  : document.getElementById('ris-entity').value.trim(),
+    fund    : document.getElementById('ris-fund').value.trim(),
+    division: document.getElementById('ris-division').value.trim(),
+    respCode: document.getElementById('ris-respcode').value.trim(),
+    office  : document.getElementById('ris-office').value.trim(),
+    risNo   : document.getElementById('ris-no').value.trim(),
+    purpose : document.getElementById('ris-purpose').value.trim(),
+    reqName : document.getElementById('ris-req-name').value.trim(),
+    reqDesig: document.getElementById('ris-req-desig').value.trim(),
+    reqDate : fmtDate(document.getElementById('ris-req-date').value),
+    apprName: document.getElementById('ris-appr-name').value.trim(),
+    apprDesig:document.getElementById('ris-appr-desig').value.trim(),
+    apprDate: fmtDate(document.getElementById('ris-appr-date').value),
+    items
+  };
+}
+
+function risBuildHTML(d){
+  // Pad to at least 20 rows (matching Excel template: rows 12-30)
+  const rows = [...d.items];
+  while(rows.length < 20) rows.push({stockNo:'',unit:'',desc:'',qty:''});
+
+  const itemRowsHTML = rows.map(it=>`
+    <tr style="height:19.575pt">
+      <td style="border:1px solid #000;padding:1pt 4pt;font-size:9pt;text-align:center">${it.stockNo}</td>
+      <td style="border:1px solid #000;padding:1pt 4pt;font-size:9pt;text-align:center">${it.unit}</td>
+      <td style="border:1px solid #000;padding:1pt 4pt;font-size:9pt">${it.desc}</td>
+      <td style="border:1px solid #000;padding:1pt 4pt;font-size:9pt;text-align:center">${it.qty}</td>
+      <td style="border:1px solid #000;padding:1pt 4pt;font-size:9pt;text-align:center"></td>
+      <td style="border:1px solid #000;padding:1pt 4pt;font-size:9pt;text-align:center"></td>
+      <td style="border:1px solid #000;padding:1pt 4pt;font-size:9pt;text-align:center"></td>
+      <td style="border:1px solid #000;padding:1pt 4pt;font-size:9pt"></td>
+    </tr>`).join('');
+
+  const sigCell = (label, name='', desig='', date='') => `
+    <td style="border-right:1px solid #000;vertical-align:top;padding:0;width:25%">
+      <table style="width:100%;border-collapse:collapse">
+        <tr><td colspan="2" style="padding:3pt 5pt 2pt;font-size:9pt;font-weight:bold;height:16.875pt">${label}</td></tr>
+        <tr style="height:16.875pt">
+          <td style="padding:0 5pt;font-size:8pt;color:#333;vertical-align:bottom;white-space:nowrap;width:80pt">Signature :</td>
+          <td style="border-bottom:1px solid #000;padding:0 3pt;vertical-align:bottom"></td>
+        </tr>
+        <tr style="height:16.875pt">
+          <td style="padding:0 5pt;font-size:8pt;color:#333;vertical-align:bottom;white-space:nowrap">Printed Name :</td>
+          <td style="border-bottom:1px solid #000;padding:0 3pt;font-size:8.5pt;vertical-align:bottom">${name}</td>
+        </tr>
+        <tr style="height:16.875pt">
+          <td style="padding:0 5pt;font-size:8pt;color:#333;vertical-align:bottom;white-space:nowrap">Designation :</td>
+          <td style="border-bottom:1px solid #000;padding:0 3pt;font-size:8.5pt;vertical-align:bottom">${desig}</td>
+        </tr>
+        <tr style="height:16.875pt">
+          <td style="padding:0 5pt;font-size:8pt;color:#333;vertical-align:bottom;white-space:nowrap">Date :</td>
+          <td style="border-bottom:1px solid #000;padding:0 3pt;font-size:8.5pt;vertical-align:bottom">${date}</td>
+        </tr>
+      </table>
+    </td>`;
+
+  return `<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<title>RIS ${d.risNo}</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:'Times New Roman',Times,serif; font-size:10pt; color:#000; background:#fff; padding:1.5cm; }
+  table { border-collapse:collapse; }
+  @page { margin:1.5cm; size:A4 portrait; }
+  @media print { body { padding:0; } }
+</style>
+</head>
+<body>
+<div style="width:100%;max-width:730px;margin:0 auto">
+
+  <div style="text-align:right;font-size:8.5pt;margin-bottom:1pt">Appendix 63</div>
+  <div style="text-align:center;font-size:13pt;font-weight:bold;letter-spacing:1px;margin-bottom:8pt">REQUISITION AND ISSUE SLIP</div>
+
+  <table style="width:100%">
+    <tr style="height:16.875pt">
+      <td style="border:1px solid #000;padding:2pt 6pt;font-size:9pt;width:55%">Entity Name :&nbsp;<span style="border-bottom:1px solid #000;display:inline-block;min-width:200pt">${d.entity}</span></td>
+      <td style="border:1px solid #000;padding:2pt 6pt;font-size:9pt">Fund Cluster :&nbsp;<span style="border-bottom:1px solid #000;display:inline-block;min-width:100pt">${d.fund}</span></td>
+    </tr>
+    <tr style="height:16.875pt">
+      <td style="border:1px solid #000;padding:2pt 6pt;font-size:9pt">Division :&nbsp;<span style="border-bottom:1px solid #000;display:inline-block;min-width:220pt">${d.division}</span></td>
+      <td style="border:1px solid #000;padding:2pt 6pt;font-size:9pt">Responsibility Center Code :&nbsp;<span style="border-bottom:1px solid #000;display:inline-block;min-width:70pt">${d.respCode}</span></td>
+    </tr>
+    <tr style="height:14.625pt">
+      <td style="border:1px solid #000;padding:2pt 6pt;font-size:9pt">Office :&nbsp;<span style="border-bottom:1px solid #000;display:inline-block;min-width:228pt">${d.office}</span></td>
+      <td style="border:1px solid #000;padding:2pt 6pt;font-size:9pt">RIS No. :&nbsp;<span style="border-bottom:1px solid #000;display:inline-block;min-width:100pt;font-weight:bold">${d.risNo}</span></td>
+    </tr>
+
+    <!-- Group header row -->
+    <tr style="height:19.575pt">
+      <th colspan="4" style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center;font-weight:bold" colspan-fix="true">
+        <table style="width:100%;border-collapse:collapse"><tr>
+          <td colspan="4" style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center;font-weight:bold">Requisition</td>
+          <td colspan="2" style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center;font-weight:bold">Stock Available?</td>
+          <td colspan="2" style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center;font-weight:bold">Issue</td>
+        </tr></table>
+      </th>
+    </tr>
+  </table>
+
+  <!-- Items table -->
+  <table style="width:100%">
+    <colgroup>
+      <col style="width:8.9%"><col style="width:4.93%"><col style="width:18.53%">
+      <col style="width:10.28%"><col style="width:10.07%"><col style="width:10.28%">
+      <col style="width:10.5%"><col style="width:26.49%">
+    </colgroup>
+    <thead>
+      <tr style="height:19.575pt">
+        <th colspan="4" style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center;font-weight:bold">Requisition</th>
+        <th colspan="2" style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center;font-weight:bold">Stock Available?</th>
+        <th colspan="2" style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center;font-weight:bold">Issue</th>
+      </tr>
+      <tr style="height:19.575pt">
+        <th style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center">Stock No.</th>
+        <th style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center">Unit</th>
+        <th style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center">Description</th>
+        <th style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center">Quantity</th>
+        <th style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center">Yes</th>
+        <th style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center">No</th>
+        <th style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center">Quantity</th>
+        <th style="border:1px solid #000;padding:2pt 4pt;font-size:9pt;text-align:center">Remarks</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${itemRowsHTML}
+      <tr style="height:21.825pt">
+        <td colspan="8" style="border:1px solid #000;padding:3pt 6pt;font-size:9pt">
+          <strong>Purpose:</strong>&nbsp;&nbsp;${d.purpose}
+        </td>
+      </tr>
+      <tr style="height:21.825pt">
+        <td colspan="8" style="border:1px solid #000;padding:3pt 6pt;font-size:9pt">&nbsp;</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Signatories -->
+  <table style="width:100%;border:1px solid #000;border-top:none">
+    <colgroup><col style="width:25%"><col style="width:25%"><col style="width:25%"><col style="width:25%"></colgroup>
+    <tr>
+      ${sigCell('Requested by:', d.reqName, d.reqDesig, d.reqDate)}
+      ${sigCell('Approved by:', d.apprName, d.apprDesig, d.apprDate)}
+      ${sigCell('Issued by:')}
+      <td style="vertical-align:top;padding:0;width:25%">
+        <table style="width:100%;border-collapse:collapse">
+          <tr><td colspan="2" style="padding:3pt 5pt 2pt;font-size:9pt;font-weight:bold;height:16.875pt">Received by:</td></tr>
+          <tr style="height:16.875pt">
+            <td style="padding:0 5pt;font-size:8pt;color:#333;vertical-align:bottom;white-space:nowrap;width:80pt">Signature :</td>
+            <td style="border-bottom:1px solid #000;padding:0 3pt;vertical-align:bottom"></td>
+          </tr>
+          <tr style="height:16.875pt">
+            <td style="padding:0 5pt;font-size:8pt;color:#333;vertical-align:bottom;white-space:nowrap">Printed Name :</td>
+            <td style="border-bottom:1px solid #000;padding:0 3pt;font-size:8.5pt;vertical-align:bottom"></td>
+          </tr>
+          <tr style="height:16.875pt">
+            <td style="padding:0 5pt;font-size:8pt;color:#333;vertical-align:bottom;white-space:nowrap">Designation :</td>
+            <td style="border-bottom:1px solid #000;padding:0 3pt;font-size:8.5pt;vertical-align:bottom"></td>
+          </tr>
+          <tr style="height:16.875pt">
+            <td style="padding:0 5pt;font-size:8pt;color:#333;vertical-align:bottom;white-space:nowrap">Date :</td>
+            <td style="border-bottom:1px solid #000;padding:0 3pt;font-size:8.5pt;vertical-align:bottom"></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+  <div style="text-align:right;font-size:7.5pt;color:#666;margin-top:3pt">AO 6/15/02</div>
+</div>
+</body></html>`;
+}
+
+function risPreview(){
+  const d = risCollect();
+  const html = risBuildHTML(d);
+  const w = window.open('','_blank','width=900,height=750');
+  w.document.write(html);
+  w.document.close();
+}
+
+function risPrint(){
+  const d = risCollect();
+  const html = risBuildHTML(d);
+  const w = window.open('','_blank','width=900,height=750');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>{ w.focus(); w.print(); }, 450);
+}
+
+function risClear(){
+  if(!confirm('Clear all RIS fields?')) return;
+  ['ris-entity','ris-fund','ris-division','ris-respcode','ris-office','ris-no',
+   'ris-purpose','ris-req-name','ris-req-desig','ris-appr-name','ris-appr-desig',
+   'ris-appr-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  const reqDate = document.getElementById('ris-req-date');
+  if(reqDate) reqDate.value = todayISO();
+  const tbody = document.getElementById('ris-items-tbody');
+  if(tbody){ tbody.innerHTML=''; risRowCount=0; for(let i=0;i<5;i++) risAddRow(); }
+}
+
+
+</script>
+</body>
+</html>
